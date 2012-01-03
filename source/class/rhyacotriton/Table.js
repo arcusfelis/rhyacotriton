@@ -11,8 +11,14 @@ qx.Class.define("rhyacotriton.Table",
   construct : function()
   {
     // table model
-    var tableModel = new qx.ui.table.model.Filtered;
-    tableModel.setColumns([ "Id", "Name", "Size", "Progress" ]);
+    var tableModel = new smart.model.Default;
+    tableModel.setColumns(
+        /*columnNameArr: */[ "Id", "Name", "Size", "Progress" ],
+        /*columnIdArr:   */[ "id", "name", "size", "progress" ]);
+
+    // Add the index to SmartTableModel
+    var indexColumnId = tableModel.getColumnIndexById("id");
+    tableModel.addIndex(indexColumnId);
 
     this.base(arguments, tableModel);
 
@@ -36,6 +42,8 @@ qx.Class.define("rhyacotriton.Table",
 
     removeSelectedRows: function() 
     {
+      this.info("RemoveSelectedRows");
+
       this.logSelectedRows();
     },
 
