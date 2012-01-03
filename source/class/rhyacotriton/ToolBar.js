@@ -47,12 +47,12 @@ qx.Class.define("rhyacotriton.ToolBar",
 
     this.__startBtn = new qx.ui.toolbar.Button(this.tr("Start"), 
       "icon/22/actions/media-playback-start.png");
-  //  this.__startBtn.setCommand(controller.getCommand("removeFeed"));
+    this.__startBtn.setCommand(controller.getCommand("startSelectedRows"));
     this.add(this.__startBtn);
 
-    this.__stopBtn = new qx.ui.toolbar.Button(this.tr("Stop"), 
+    this.__stopBtn = new qx.ui.toolbar.Button(this.tr("Pause"), 
       "icon/22/actions/media-playback-pause.png");
-  //  this.__stopBtn.setCommand(controller.getCommand("removeFeed"));
+    this.__stopBtn.setCommand(controller.getCommand("stopSelectedRows"));
     this.add(this.__stopBtn);
 
     this.enableRowButtons(false);

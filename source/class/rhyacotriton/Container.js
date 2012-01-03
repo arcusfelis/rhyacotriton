@@ -25,7 +25,9 @@ qx.Class.define("rhyacotriton.Container",
     this.__toolBar = new rhyacotriton.ToolBar(this);
     this.add(this.__toolBar, {edge: "north"});
 
-    this.__table = new rhyacotriton.Table;
+    this.__store = new rhyacotriton.Store;
+
+    this.__table = new rhyacotriton.Table(this.__store);
     this.add(this.__table);
 
 
@@ -47,6 +49,14 @@ qx.Class.define("rhyacotriton.Container",
      */
     removeSelectedRows: function() {
       this.__table.removeSelectedRows();
+    },
+
+    startSelectedRows: function() {
+      this.__table.startSelectedRows();
+    },
+
+    stopSelectedRows: function() {
+      this.__table.stopSelectedRows();
     },
 
     reload: function() {
@@ -82,6 +92,11 @@ qx.Class.define("rhyacotriton.Container",
       commands.removeSelectedRows = new qx.ui.core.Command("Control+D");
       commands.removeSelectedRows.addListener("execute", this.removeSelectedRows, this);
 
+      commands.startSelectedRows = new qx.ui.core.Command("Control+S");
+      commands.startSelectedRows.addListener("execute", this.startSelectedRows, this);
+
+      commands.stopSelectedRows = new qx.ui.core.Command("Control+P");
+      commands.stopSelectedRows.addListener("execute", this.stopSelectedRows, this);
       this.__commands = commands;
     }
 
