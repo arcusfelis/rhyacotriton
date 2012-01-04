@@ -64,18 +64,21 @@ qx.Class.define("rhyacotriton.Table",
     logSelectedRows: function() 
     {
       var tm = this.__tableModel;
-      this.__selectionModel.iterateSelection(function(index) {
-        console.log("Index " + index);
-        console.dir(tm.getRowData(index));
+      this.__selectionModel.iterateSelection(function(pos) {
+        console.log("Position " + pos);
+        console.dir(tm.getRowData(pos));
       });
     },
 
+    /**
+     * Returns an array of object's ids.
+     */
     getSelectedIds: function()
     {
       var ids = [];
       var table = this;
-      this.__selectionModel.iterateSelection(function(index) {
-        ids.push(table.__tableModel.getValue(table.__indexColumnId, index));
+      this.__selectionModel.iterateSelection(function(pos) {
+        ids.push(table.__tableModel.getValue(table.__indexColumnId, pos));
       });
       return ids;
     },
@@ -86,11 +89,11 @@ qx.Class.define("rhyacotriton.Table",
 
       this.logSelectedRows();
       var table = this;
-      this.__selectionModel.iterateSelection(function(index) {
-        console.log("Index " + index);
-        var row = table.__tableModel.getRowDataAsMap(index);
+      this.__selectionModel.iterateSelection(function(pos) {
+        console.log("Position " + pos);
+        var row = table.__tableModel.getRowDataAsMap(pos);
         table.__store.removeElement(row);
-        table.__tableModel.removeRows(index, 1);
+        table.__tableModel.removeRows(pos, 1);
       });
     },
 
@@ -124,8 +127,13 @@ qx.Class.define("rhyacotriton.Table",
 
     __onDataRemoved: function(/*qx.event.type.Data*/ event)
     {
-      //var id = event.getData().id;
-      //console.log("Purge from the table entry by real id " + id);
+      var id = event.getData().id;
+      console.log("Purge from the table entry by real id " + id);
+      
+      var pos = this.__tableModel.locate(this.__indexColumnId, index);
+      /* Purge data from the table. */
+      if (pos != 'undefined')
+        table.__tableModel.removeRows(pos, 1);
     },
 
 
@@ -138,7 +146,6 @@ qx.Class.define("rhyacotriton.Table",
 
     particallyUpdateRows: function(Rows)
     {
-        console.dir(Rows);
         for (var i = 0, count = Rows.length; i < count; i++) {
             var row = Rows[i];
             if (typeof(row.id) == 'undefined')
