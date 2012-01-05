@@ -12,9 +12,11 @@ qx.Class.define("rhyacotriton.Container",
 
   construct : function()
   {
+    var container = this;
+
     // Create main layout
-    var dockLayout = new qx.ui.layout.Dock();
-    this.base(arguments, dockLayout);
+    this.__mainLayout = new qx.ui.layout.Dock();
+    this.base(arguments, this.__mainLayout);
     this._initializeCommands();
 
     // Create header
@@ -25,13 +27,18 @@ qx.Class.define("rhyacotriton.Container",
     this.__toolBar = new rhyacotriton.ToolBar(this);
     this.add(this.__toolBar, {edge: "north"});
 
-    this.__store = new rhyacotriton.Store;
+    this.__store = new rhyacotriton.store.Remote;
+    this.__store.addListener("stateChanged", 
+      function(e) {
+        var isEnabled = e.getCurrentTarget().isActive();
+        container.setEnabled(isEnabled);
+      }, this.__store);
 
     this.__table = new rhyacotriton.Table(this.__store);
     this.add(this.__table);
 
 
-      var selModel = this.__table.getSelectionModel();
+    var selModel = this.__table.getSelectionModel();
 
     // Register action for enabling the buttons when
     // a row is selected.
@@ -40,9 +47,17 @@ qx.Class.define("rhyacotriton.Container",
         var isEnabled = !(e.getCurrentTarget().isSelectionEmpty());
         this.enableRowButtons(isEnabled);
       }, this.__toolBar);
+
+    this.setEnabled(false); 
   },
 
   members: {
+    __mainLayout : null,
+    __header : null,
+    __toolBar : null,
+    __store : null,
+    __table : null,
+    __commands : null,
 
     /**
      * Delete selected rows from the table
@@ -98,7 +113,11 @@ qx.Class.define("rhyacotriton.Container",
       commands.stopSelectedRows = new qx.ui.core.Command("Control+P");
       commands.stopSelectedRows.addListener("execute", this.stopSelectedRows, this);
       this.__commands = commands;
-    }
+    },
 
+    setEnabled : function(flag) {
+        this.__toolBar.setEnabled(flag);
+        this.__table.setEnabled(flag);
+    }
   }
 });

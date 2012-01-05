@@ -15,8 +15,8 @@ qx.Class.define("rhyacotriton.Table",
     // table model
     this.__tableModel = new smart.model.Default;
     this.__tableModel.setColumns(
-        /*columnNameArr: */[ "Id", "Name", "Size", "Progress", "On-line" ],
-        /*columnIdArr:   */[ "id", "name", "size", "progress", "online" ]);
+        /*columnNameArr: */[ "Id", "Total", "On-line" ],
+        /*columnIdArr:   */[ "id", "total", "online" ]);
 
 
     // Install tableModel
@@ -48,7 +48,6 @@ qx.Class.define("rhyacotriton.Table",
             this.__onDataLoadCompleted, this);
     this.__store.addListener("dataUpdated", 
             this.__onDataUpdated, this);
-    this.loadData();
   },
 
   members: {
@@ -121,7 +120,8 @@ qx.Class.define("rhyacotriton.Table",
     __onDataLoadCompleted: function(/*qx.event.type.Data*/ event)
     {
       var data = event.getData();
-      this.__tableModel.setDataAsMapArray(data.data);
+      this.__tableModel.setDataAsMapArray(data.rows);
+      this.updateContent();
     },
 
 
@@ -130,10 +130,10 @@ qx.Class.define("rhyacotriton.Table",
       var id = event.getData().id;
       console.log("Purge from the table entry by real id " + id);
       
-      var pos = this.__tableModel.locate(this.__indexColumnId, index);
+      var pos = this.__tableModel.locate(this.__indexColumnId, id);
       /* Purge data from the table. */
       if (pos != 'undefined')
-        table.__tableModel.removeRows(pos, 1);
+        this.__tableModel.removeRows(pos, 1);
     },
 
 
@@ -161,7 +161,7 @@ qx.Class.define("rhyacotriton.Table",
     __onDataUpdated: function(/*qx.event.type.Data*/ event)
     {
       var data = event.getData();
-      this.particallyUpdateRows(data.data);
+      this.particallyUpdateRows(data.rows);
     }
   }
 });

@@ -1,9 +1,9 @@
 /**
  * The GUI definition of the qooxdoo unit test runner.
  */
-qx.Class.define("rhyacotriton.Store",
+qx.Class.define("rhyacotriton.store.Local",
 {
-  extend: qx.core.Object,
+  extend: rhyacotriton.store.Abstract,
   /*
   *****************************************************************************
      CONSTRUCTOR
@@ -16,6 +16,7 @@ qx.Class.define("rhyacotriton.Store",
       var newValues = [{"online": true}];
       this.fireDataEvent("dataEdited", {"id": id, "data": newValues});
     */
+    this.base(arguments);
   },
 
   members: {
@@ -54,47 +55,5 @@ qx.Class.define("rhyacotriton.Store",
     }
 
 //this.fireDataEvent("columnVisibilityMenuCreateStart", data);
-  },
-  events: {
-    /**
-     * Dispatched after a respond is trasmitted from server.
-     *
-     * The data is a map containing this properties:
-     * <ul>
-     *   <li>data</li>
-     *   <li>[{id, ...}]</li>
-     * </ul>
-     */
-    "dataUpdated" : "qx.event.type.Data", 
-
-    /**
-     * Dispatched after a respond is trasmitted from server.
-     *
-     * The data is a map containing this properties:
-     * <ul>
-     *   <li>id</li>
-     * </ul>
-     */
-    "dataRemoved" : "qx.event.type.Data", 
-
-    /**
-     * Dispatched after a respond is trasmitted from server.
-     *
-     * The data is a map containing this properties:
-     * <ul>
-     *   <li>id</li>
-     * </ul>
-     */
-    "dataRemoveFailure" : "qx.event.type.Data",
-
-    /**
-     * Load a full set of data from server.
-     *
-     * The data is a map containing this properties:
-     * <ul>
-     *   <li>data</li>
-     * </ul>
-     */
-    "dataLoadCompleted" : "qx.event.type.Data"
   }
 });

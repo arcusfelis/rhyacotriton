@@ -60,11 +60,30 @@ qx.Class.define("rhyacotriton.ToolBar",
 
   members :
   { 
+    __isRowButtonsEnabled : true,
+    __enableRowButtons: function(flag)
+    {
+      [ this.__removeBtn
+      , this.__startBtn
+      , this.__stopBtn
+      ].map(function(x) {
+        x.setEnabled(flag);
+      });
+    },
     enableRowButtons: function(flag)
     {
-      this.__removeBtn.setEnabled(flag);
-      this.__startBtn.setEnabled(flag);
-      this.__stopBtn.setEnabled(flag);
+      this.__isRowButtonsEnabled = flag;
+      this.__enableRowButtons(flag);
+    },
+    setEnabled: function(flag)
+    {
+      [ this.__addBtn
+      , this.__reloadBtn
+      ].map(function(x) {
+        x.setEnabled(flag);
+      });
+      if (flag == this.__isRowButtonsEnabled)
+        this.__enableRowButtons(flag);
     }
   }
 });
