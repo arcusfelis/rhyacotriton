@@ -29,6 +29,11 @@ qx.Class.define("rhyacotriton.ToolBar",
   {
     this.base(arguments);
 
+    this.__reconnectBtn = new qx.ui.toolbar.Button(this.tr("Reconnect"), 
+        "icon/22/actions/view-refresh.png");
+    this.__reconnectBtn.setCommand(controller.getCommand("reconnect"));
+    this.add(this.__reconnectBtn);
+
     this.__reloadBtn = new qx.ui.toolbar.Button(this.tr("Refresh"), 
         "icon/22/actions/view-refresh.png");
     this.__reloadBtn.setCommand(controller.getCommand("reload"));

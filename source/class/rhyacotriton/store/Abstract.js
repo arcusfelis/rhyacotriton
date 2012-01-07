@@ -17,7 +17,8 @@ qx.Class.define("rhyacotriton.store.Abstract",
 
   members: {
     __isActive : true,
-    loadData : function() {},
+    reconnect : function() {},
+    reload : function() {},
     removeElement : function(/*Map*/ oldData) {},  
     stop : function(/*Array*/ ids) {},  
     start : function(/*Array*/ ids) {},

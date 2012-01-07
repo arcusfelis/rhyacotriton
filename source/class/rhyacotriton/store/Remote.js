@@ -24,39 +24,14 @@ qx.Class.define("rhyacotriton.store.Remote",
     // basedir of url
     basedir = basedir.substring(0, basedir.lastIndexOf('/')) + '/';
     // url of the bullet handler
-    var url = basedir + "stream"; 
-
-    var bullet = $.bullet(url);
-    var store = this;
-    this.__bullet = bullet;
-
-    bullet.onopen = function(){
-      console.log('WebSocket: opened');
-
-      store.sendText("get_entire_torrent_list");
-
-      store.setActive(true);
-      store.fireEvent("stateChanged");
-    };
-    bullet.onclose = function(){
-        console.log('WebSocket: closed');
-
-      store.setActive(false);
-      store.fireEvent("stateChanged");
-    };
-    bullet.onmessage = function(e){
-        console.log('WebSocket: ' + e.data);
-        var parsedData = qx.lang.Json.parse(e.data);
-        console.dir(parsedData);
-        store.fireDataEvent(parsedData.event, parsedData.data);
-    };
-    bullet.onheartbeat = function(){
-        console.log('WebSocket: heartbeat');
-    }
+    this.__url = basedir + "stream"; 
+    
+    this.__openConnection();
   },
 
   members: {
     __bullet : null,
+    __url : null,
 
     sendJSON : function(query) {
       this.__bullet.send(
@@ -66,11 +41,23 @@ qx.Class.define("rhyacotriton.store.Remote",
       this.__bullet.send(query);
     },
 
+    // 
+    // Implementation of abstract functions.
+    // 
+
     /**
-     * Implementation of abstract functions.
+     * Create new connection to the server
      */
-    loadData : function() {
-      
+    reconnect : function() {
+        this.__closeConnection();
+        this.__openConnection();
+    },
+
+    /**
+     * Refresh the table
+     */
+    reload : function() {
+        this.sendText("get_entire_torrent_list");
     },
 
     removeElement : function(/*arrayMap*/ oldData) {
@@ -86,8 +73,46 @@ qx.Class.define("rhyacotriton.store.Remote",
 
     start : function(/*Array*/ ids) {
       //this.fireDataEvent("dataUpdated", {"data": [{"id": 1, "name": "test"}]});
-    }
+    },
 
+
+    // 
+    // Private functions
+    // 
+
+    __openConnection : function() {
+        var bullet = $.bullet(this.__url);
+        var store = this;
+        this.__bullet = bullet;
+
+        bullet.onopen = function(){
+          console.log('WebSocket: opened');
+
+          store.sendText("get_entire_torrent_list");
+
+          store.setActive(true);
+          store.fireEvent("stateChanged");
+        };
+        bullet.onclose = function(){
+            console.log('WebSocket: closed');
+
+          store.setActive(false);
+          store.fireEvent("stateChanged");
+        };
+        bullet.onmessage = function(e){
+            console.log('WebSocket: ' + e.data);
+            var parsedData = qx.lang.Json.parse(e.data);
+            console.dir(parsedData);
+            store.fireDataEvent(parsedData.event, parsedData.data);
+        };
+        bullet.onheartbeat = function(){
+            console.log('WebSocket: heartbeat');
+        }
+    },
+    __closeConnection : function() {
+        this.__bullet.close();
+        delete this.__bullet;
+    }
 //this.fireDataEvent("columnVisibilityMenuCreateStart", data);
   }
 });

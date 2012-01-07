@@ -74,7 +74,12 @@ qx.Class.define("rhyacotriton.Container",
       this.__table.stopSelectedRows();
     },
 
+    reconnect: function() {
+      this.__store.reconnect();
+    },
+
     reload: function() {
+      this.__store.reload();
     },
 
     showAddTorrent: function() {
@@ -97,6 +102,9 @@ qx.Class.define("rhyacotriton.Container",
     _initializeCommands : function()
     {
       var commands = {};
+
+      commands.reconnect = new qx.ui.core.Command("Control+Shift+R");
+      commands.reconnect.addListener("execute", this.reconnect, this);
 
       commands.reload = new qx.ui.core.Command("Control+R");
       commands.reload.addListener("execute", this.reload, this);

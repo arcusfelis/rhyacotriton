@@ -15,19 +15,41 @@ qx.Class.define("rhyacotriton.Table",
     // table model
     this.__tableModel = new smart.model.Default;
     this.__tableModel.setColumns(
-        /*columnNameArr: */[ "Id", "Total", "On-line" ],
-        /*columnIdArr:   */[ "id", "total", "online" ]);
+        /*columnNameArr: */[ "Id", "Name", "Total", "Progress", "Left", 
+            "On-line", "Leechers", "Seeders" ],
+        /*columnIdArr:   */[ "id", "name", "total", "progress", "left", 
+            "online",  "leechers", "seeders" ]);
 
 
     // Install tableModel
     this.base(arguments, this.__tableModel);
 
     this.__tableColumnModel = this.getTableColumnModel();
-    this.__onlineColumnId = this.__tableModel.getColumnIndexById("online");
-    this.__tableColumnModel.setColumnVisible(this.__onlineColumnId, false);
 
+    this.__onlineColumnId = 
+        this.__tableModel.getColumnIndexById("online");
+    this.__leftColumnId = 
+        this.__tableModel.getColumnIndexById("left");
+    this.__totalColumnId = 
+        this.__tableModel.getColumnIndexById("total");
+    this.__progressColumnId = 
+        this.__tableModel.getColumnIndexById("progress");
+
+    this.__tableColumnModel.setColumnVisible(this.__onlineColumnId, false);
+    this.__tableColumnModel.setColumnVisible(this.__leftColumnId, false);
+
+    var table = this;
+    var proxy = function(rowData) {
+            return table.__renderProgress(rowData);
+        }
     this.__tableColumnModel.setDataCellRenderer(this.__onlineColumnId,
-                            new qx.ui.table.cellrenderer.Boolean());
+        new qx.ui.table.cellrenderer.Boolean());
+    this.__tableColumnModel.setDataCellRenderer(this.__progressColumnId,
+        new rhyacotriton.cellrenderer.Progress(proxy));
+    this.__tableColumnModel.setDataCellRenderer(this.__totalColumnId,
+        new rhyacotriton.cellrenderer.Size());
+    this.__tableColumnModel.setDataCellRenderer(this.__leftColumnId,
+        new rhyacotriton.cellrenderer.Size());
 
     // Get SelectionModel
     this.__selectionModel = this.getSelectionModel();
@@ -55,10 +77,21 @@ qx.Class.define("rhyacotriton.Table",
 
     __indexColumnId: null,
     __onlineColumnId: null,
+    __leftColumnId: null,
+    __totalColumnId: null,
+    __progressColumnId: null,
+
     __tableModel : null,
     __tableColumnModel : null,
     __selectionModel : null,
 
+    __renderProgress : function(rowData) {
+        var total      = rowData[this.__totalColumnId];
+        var left       = rowData[this.__leftColumnId];
+        var completed  = total - left;
+
+        return ((completed / total) * 100).toFixed(2) + "%";
+    },
 
     logSelectedRows: function() 
     {
@@ -111,16 +144,24 @@ qx.Class.define("rhyacotriton.Table",
     },
 
 
-    loadData: function()
-    {
-      this.__store.loadData();
-    },
-
-
     __onDataLoadCompleted: function(/*qx.event.type.Data*/ event)
     {
       var data = event.getData();
+      
+      try
+      {
+          this.__tableModel.removeRows(
+            /* startIndex */ 0, 
+            /* howMany */ undefined, 
+            /* view */ undefined, 
+            /* fireEvent */ false);
+      }
+      catch (err)
+      {
+        console.log("Is the table empty?");
+      }
       this.__tableModel.setDataAsMapArray(data.rows);
+
       this.updateContent();
     },
 
@@ -140,7 +181,7 @@ qx.Class.define("rhyacotriton.Table",
     __onDataRemoveFailure: function(/*qx.event.type.Data*/ event)
     {
       var data = event.getOldData();
-      this.__tableModel.addRowsAsMapArray([data]);
+      this.__tableModel.setRowsAsMapArray([data]);
     },
 
 
@@ -151,9 +192,11 @@ qx.Class.define("rhyacotriton.Table",
             if (typeof(row.id) == 'undefined')
                 this.error("Cannot get Rows[i].id");
 
+            var pos = this.__tableModel.locate(this.__indexColumnId, row.id);
             for (var j in row) {
-                if (j != "id")
-                    this.__tableModel.setValueById(j, row.id, row[j]);
+                if (j == "id") continue;
+                var columnId = this.__tableModel.getColumnIndexById(j);
+                this.__tableModel.setValue(columnId, pos, row[j]);
             }
         }
     },
@@ -162,6 +205,7 @@ qx.Class.define("rhyacotriton.Table",
     {
       var data = event.getData();
       this.particallyUpdateRows(data.rows);
+      this.updateContent();
     }
   }
 });
