@@ -17,13 +17,17 @@ qx.Class.define("rhyacotriton.Table",
     this.__tableModel = new smart.model.Default;
     this.__tableModel.setColumns(
         /*columnNameArr: */[ "Id", "Name", "Total", "Left", "Progress", "Rating",
-            "On-line", "Ss", "Ls", 
-            "Downloaded", "Uploaded", "State",
-            "Total uploaded", "Total downloaded" ],
+            "On-line", "Ss", "Ls", "State",
+            "Downloaded Now", "Uploaded Now", 
+            "uploaded Before", "Downloaded Before",
+            "Total downloaded", "Total uploaded"
+            ],
         /*columnIdArr:   */[ "id", "name", "total", "left", "progress", "rating",
-            "online", "seeders",  "leechers",
-            "downloaded", "uploaded", "state",
-            "all_time_uploaded", "all_time_downloaded" ]);
+            "online", "seeders",  "leechers", "state",
+            "downloaded", "uploaded",
+            "all_time_uploaded", "all_time_downloaded",
+            "sum_downloaded", "sum_uploaded"
+            ]);
 
 
     // Install tableModel
@@ -51,9 +55,13 @@ qx.Class.define("rhyacotriton.Table",
         this.__tableModel.getColumnIndexById("downloaded");
     this.__uploadedColumnId = 
         this.__tableModel.getColumnIndexById("uploaded");
-    this.__totalDownloadedColumnId = 
+    this.__sumDownloadedColumnId = 
+        this.__tableModel.getColumnIndexById("sum_downloaded");
+    this.__sumUploadedColumnId = 
+        this.__tableModel.getColumnIndexById("sum_uploaded");
+    this.__beforeDownloadedColumnId = 
         this.__tableModel.getColumnIndexById("all_time_downloaded");
-    this.__totalUploadedColumnId = 
+    this.__beforeUploadedColumnId = 
         this.__tableModel.getColumnIndexById("all_time_uploaded");
     this.__ratingColumnId = 
         this.__tableModel.getColumnIndexById("rating");
@@ -61,8 +69,6 @@ qx.Class.define("rhyacotriton.Table",
         this.__tableModel.getColumnIndexById("state");
 
 
-    this.__tableColumnModel.setColumnVisible(this.__onlineColumnId, false);
-    this.__tableColumnModel.setColumnVisible(this.__leftColumnId, false);
 
     this.__tableColumnModel.setColumnWidth(this.__nameColumnId, 300, true);
     this.__tableColumnModel.setColumnWidth(this.__indexColumnId, 30, true);
@@ -73,9 +79,9 @@ qx.Class.define("rhyacotriton.Table",
     this.__tableColumnModel.setColumnWidth(this.__seedersColumnId, 40, true);
     this.__tableColumnModel.setColumnWidth(this.__stateColumnId, 70, true);
     this.__tableColumnModel.setColumnWidth(this.__ratingColumnId, 70, true);
-    this.__tableColumnModel.setColumnWidth(this.__totalDownloadedColumnId, 
+    this.__tableColumnModel.setColumnWidth(this.__beforeDownloadedColumnId, 
         70, true);
-    this.__tableColumnModel.setColumnWidth(this.__totalUploadedColumnId, 70, true);
+    this.__tableColumnModel.setColumnWidth(this.__beforeUploadedColumnId, 70, true);
     this.__tableColumnModel.setColumnWidth(this.__downloadedColumnId, 70, true);
     this.__tableColumnModel.setColumnWidth(this.__uploadedColumnId, 70, true);
 
@@ -96,11 +102,32 @@ qx.Class.define("rhyacotriton.Table",
     ,this.__leftColumnId
     ,this.__downloadedColumnId
     ,this.__uploadedColumnId
-    ,this.__totalDownloadedColumnId
-    ,this.__totalUploadedColumnId
+    ,this.__beforeDownloadedColumnId
+    ,this.__beforeUploadedColumnId
     ].map(function(id) {
         table.__tableColumnModel.setDataCellRenderer(id,
             new rhyacotriton.cellrenderer.Size());
+    });
+
+    var sumDownProxy = function(rowData) {
+            return table.__calcSumDownloading(rowData);
+        }
+    var sumUpProxy = function(rowData) {
+            return table.__calcSumUploading(rowData);
+        }
+    table.__tableColumnModel.setDataCellRenderer(this.__sumDownloadedColumnId,
+        new rhyacotriton.cellrenderer.Size(sumDownProxy));
+    table.__tableColumnModel.setDataCellRenderer(this.__sumUploadedColumnId,
+        new rhyacotriton.cellrenderer.Size(sumUpProxy));
+
+    [this.__leftColumnId
+    ,this.__downloadedColumnId
+    ,this.__uploadedColumnId
+    ,this.__beforeDownloadedColumnId
+    ,this.__beforeUploadedColumnId
+    ,this.__onlineColumnId
+    ].map(function(id) {
+        table.__tableColumnModel.setColumnVisible(id, false);
     });
 
     // Get SelectionModel
@@ -139,10 +166,12 @@ qx.Class.define("rhyacotriton.Table",
     __seedersColumnId: null,
     __stateColumnId: null,
     __ratingColumnId: null,
-    __totalDownloadedColumnId: null,
-    __totalUploadedColumnId: null,
+    __beforeDownloadedColumnId: null,
+    __beforeUploadedColumnId: null,
     __downloadedColumnId: null,
     __uploadedColumnId: null,
+    __sumDownloadedColumnId: null,
+    __sumUploadedColumnId: null,
 
     __tableModel : null,
     __tableColumnModel : null,
@@ -157,11 +186,27 @@ qx.Class.define("rhyacotriton.Table",
     },
 
     __calcRating : function(rowData) {
-        var up   = rowData[this.__totalUploadedColumnId];
-        var down = rowData[this.__totalDownloadedColumnId];
+        var up    = rowData[this.__uploadedColumnId];
+        var down  = rowData[this.__downloadedColumnId];
+        var tup   = rowData[this.__beforeUploadedColumnId];
+        var tdown = rowData[this.__beforeDownloadedColumnId];
 
         if (down == 0) return 0;
-        return (up / down).toFixed(2);
+        return ((up+tup) / (down+tdown)).toFixed(2);
+    },
+
+    __calcSumDownloading : function(rowData) {
+        var down  = rowData[this.__downloadedColumnId];
+        var tdown = rowData[this.__beforeDownloadedColumnId];
+
+        return (down+tdown);
+    },
+
+    __calcSumUploading : function(rowData) {
+        var up    = rowData[this.__uploadedColumnId];
+        var tup   = rowData[this.__beforeUploadedColumnId];
+
+        return (up+tup);
     },
 
     logSelectedRows: function() 
