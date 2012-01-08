@@ -19,7 +19,7 @@ qx.Class.define("rhyacotriton.Table",
         /*columnNameArr: */[ "Id", "Name", "Total", "Left", "Progress", "Rating",
             "On-line", "Ss", "Ls", "State",
             "Downloaded Now", "Uploaded Now", 
-            "uploaded Before", "Downloaded Before",
+            "Uploaded Before", "Downloaded Before",
             "Total downloaded", "Total uploaded"
             ],
         /*columnIdArr:   */[ "id", "name", "total", "left", "progress", "rating",
@@ -186,27 +186,29 @@ qx.Class.define("rhyacotriton.Table",
     },
 
     __calcRating : function(rowData) {
-        var up    = rowData[this.__uploadedColumnId];
-        var down  = rowData[this.__downloadedColumnId];
-        var tup   = rowData[this.__beforeUploadedColumnId];
-        var tdown = rowData[this.__beforeDownloadedColumnId];
+        var nowU    = rowData[this.__uploadedColumnId];
+        var nowD    = rowData[this.__downloadedColumnId];
+        var beforeU = rowData[this.__beforeUploadedColumnId];
+        var beforeD = rowData[this.__beforeDownloadedColumnId];
 
-        if (down == 0) return 0;
-        return ((up+tup) / (down+tdown)).toFixed(2);
+        var totalD = nowD + beforeD;
+        var totalU = nowU + beforeU;
+        if (totalD == 0) return 0;
+        return (totalU / totalD).toFixed(2);
     },
 
     __calcSumDownloading : function(rowData) {
-        var down  = rowData[this.__downloadedColumnId];
-        var tdown = rowData[this.__beforeDownloadedColumnId];
+        var now    = rowData[this.__downloadedColumnId];
+        var before = rowData[this.__beforeDownloadedColumnId];
 
-        return (down+tdown);
+        return now+before;
     },
 
     __calcSumUploading : function(rowData) {
-        var up    = rowData[this.__uploadedColumnId];
-        var tup   = rowData[this.__beforeUploadedColumnId];
+        var now    = rowData[this.__uploadedColumnId];
+        var before = rowData[this.__beforeUploadedColumnId];
 
-        return (up+tup);
+        return now+before;
     },
 
     logSelectedRows: function() 
