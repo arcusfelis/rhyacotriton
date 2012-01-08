@@ -6,6 +6,7 @@
 #asset(qx/icon/Tango/22/actions/view-refresh.png)
 #asset(qx/icon/Tango/22/actions/media-playback-start.png)
 #asset(qx/icon/Tango/22/actions/media-playback-pause.png)
+#asset(qx/icon/Tango/22/devices/network-wired.png)
 
 ************************************************************************ */
 
@@ -30,7 +31,7 @@ qx.Class.define("rhyacotriton.ToolBar",
     this.base(arguments);
 
     this.__reconnectBtn = new qx.ui.toolbar.Button(this.tr("Reconnect"), 
-        "icon/22/actions/view-refresh.png");
+        "icon/22/devices/network-wired.png");
     this.__reconnectBtn.setCommand(controller.getCommand("reconnect"));
     this.add(this.__reconnectBtn);
 

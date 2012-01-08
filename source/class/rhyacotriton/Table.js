@@ -11,14 +11,19 @@ qx.Class.define("rhyacotriton.Table",
   construct : function(store)
   {
     this.__store = store;
+    var table = this;
 
     // table model
     this.__tableModel = new smart.model.Default;
     this.__tableModel.setColumns(
-        /*columnNameArr: */[ "Id", "Name", "Total", "Progress", "Left", 
-            "On-line", "Leechers", "Seeders" ],
-        /*columnIdArr:   */[ "id", "name", "total", "progress", "left", 
-            "online",  "leechers", "seeders" ]);
+        /*columnNameArr: */[ "Id", "Name", "Total", "Left", "Progress", "Rating",
+            "On-line", "Ss", "Ls", 
+            "Downloaded", "Uploaded", "State",
+            "Total uploaded", "Total downloaded" ],
+        /*columnIdArr:   */[ "id", "name", "total", "left", "progress", "rating",
+            "online", "seeders",  "leechers",
+            "downloaded", "uploaded", "state",
+            "all_time_uploaded", "all_time_downloaded" ]);
 
 
     // Install tableModel
@@ -26,6 +31,10 @@ qx.Class.define("rhyacotriton.Table",
 
     this.__tableColumnModel = this.getTableColumnModel();
 
+    this.__indexColumnId = 
+        this.__tableModel.getColumnIndexById("id");
+    this.__nameColumnId = 
+        this.__tableModel.getColumnIndexById("name");
     this.__onlineColumnId = 
         this.__tableModel.getColumnIndexById("online");
     this.__leftColumnId = 
@@ -34,22 +43,65 @@ qx.Class.define("rhyacotriton.Table",
         this.__tableModel.getColumnIndexById("total");
     this.__progressColumnId = 
         this.__tableModel.getColumnIndexById("progress");
+    this.__leechersColumnId = 
+        this.__tableModel.getColumnIndexById("leechers");
+    this.__seedersColumnId = 
+        this.__tableModel.getColumnIndexById("seeders");
+    this.__downloadedColumnId = 
+        this.__tableModel.getColumnIndexById("downloaded");
+    this.__uploadedColumnId = 
+        this.__tableModel.getColumnIndexById("uploaded");
+    this.__totalDownloadedColumnId = 
+        this.__tableModel.getColumnIndexById("all_time_downloaded");
+    this.__totalUploadedColumnId = 
+        this.__tableModel.getColumnIndexById("all_time_uploaded");
+    this.__ratingColumnId = 
+        this.__tableModel.getColumnIndexById("rating");
+    this.__stateColumnId = 
+        this.__tableModel.getColumnIndexById("state");
+
 
     this.__tableColumnModel.setColumnVisible(this.__onlineColumnId, false);
     this.__tableColumnModel.setColumnVisible(this.__leftColumnId, false);
 
-    var table = this;
-    var proxy = function(rowData) {
-            return table.__renderProgress(rowData);
+    this.__tableColumnModel.setColumnWidth(this.__nameColumnId, 300, true);
+    this.__tableColumnModel.setColumnWidth(this.__indexColumnId, 30, true);
+    this.__tableColumnModel.setColumnWidth(this.__progressColumnId, 70, true);
+    this.__tableColumnModel.setColumnWidth(this.__totalColumnId, 70, true);
+    this.__tableColumnModel.setColumnWidth(this.__leftColumnId, 70, true);
+    this.__tableColumnModel.setColumnWidth(this.__leechersColumnId, 40, true);
+    this.__tableColumnModel.setColumnWidth(this.__seedersColumnId, 40, true);
+    this.__tableColumnModel.setColumnWidth(this.__stateColumnId, 70, true);
+    this.__tableColumnModel.setColumnWidth(this.__ratingColumnId, 70, true);
+    this.__tableColumnModel.setColumnWidth(this.__totalDownloadedColumnId, 
+        70, true);
+    this.__tableColumnModel.setColumnWidth(this.__totalUploadedColumnId, 70, true);
+    this.__tableColumnModel.setColumnWidth(this.__downloadedColumnId, 70, true);
+    this.__tableColumnModel.setColumnWidth(this.__uploadedColumnId, 70, true);
+
+    var progressProxy = function(rowData) {
+            return table.__calcProgress(rowData);
         }
+    var ratingProxy = function(rowData) {
+            return table.__calcRating(rowData);
+        }
+    this.__tableColumnModel.setDataCellRenderer(this.__progressColumnId,
+        new rhyacotriton.cellrenderer.Progress(progressProxy));
+    this.__tableColumnModel.setDataCellRenderer(this.__ratingColumnId,
+        new rhyacotriton.cellrenderer.Rating(ratingProxy));
     this.__tableColumnModel.setDataCellRenderer(this.__onlineColumnId,
         new qx.ui.table.cellrenderer.Boolean());
-    this.__tableColumnModel.setDataCellRenderer(this.__progressColumnId,
-        new rhyacotriton.cellrenderer.Progress(proxy));
-    this.__tableColumnModel.setDataCellRenderer(this.__totalColumnId,
-        new rhyacotriton.cellrenderer.Size());
-    this.__tableColumnModel.setDataCellRenderer(this.__leftColumnId,
-        new rhyacotriton.cellrenderer.Size());
+    
+    [this.__totalColumnId
+    ,this.__leftColumnId
+    ,this.__downloadedColumnId
+    ,this.__uploadedColumnId
+    ,this.__totalDownloadedColumnId
+    ,this.__totalUploadedColumnId
+    ].map(function(id) {
+        table.__tableColumnModel.setDataCellRenderer(id,
+            new rhyacotriton.cellrenderer.Size());
+    });
 
     // Get SelectionModel
     this.__selectionModel = this.getSelectionModel();
@@ -58,12 +110,14 @@ qx.Class.define("rhyacotriton.Table",
     );
 
     // Add the index to SmartTableModel
-    this.__indexColumnId = this.__tableModel.getColumnIndexById("id");
     this.__tableModel.indexedSelection(this.__indexColumnId, 
                                        this.__selectionModel);
     this.__tableModel.addIndex(this.__indexColumnId);
 
-    this.__store.addListener("dataRemoved", this.__onDataRemoved, this);
+    this.__store.addListener("dataAdded", 
+        this.__onDataAdded, this);
+    this.__store.addListener("dataRemoved", 
+        this.__onDataRemoved, this);
     this.__store.addListener("dataRemoveFailure", 
             this.__onDataRemoveFailure, this);
     this.__store.addListener("dataLoadCompleted", 
@@ -76,21 +130,38 @@ qx.Class.define("rhyacotriton.Table",
     __store: null,
 
     __indexColumnId: null,
+    __nameColumnId: null,
     __onlineColumnId: null,
     __leftColumnId: null,
     __totalColumnId: null,
     __progressColumnId: null,
+    __leechersColumnId: null,
+    __seedersColumnId: null,
+    __stateColumnId: null,
+    __ratingColumnId: null,
+    __totalDownloadedColumnId: null,
+    __totalUploadedColumnId: null,
+    __downloadedColumnId: null,
+    __uploadedColumnId: null,
 
     __tableModel : null,
     __tableColumnModel : null,
     __selectionModel : null,
 
-    __renderProgress : function(rowData) {
+    __calcProgress : function(rowData) {
         var total      = rowData[this.__totalColumnId];
         var left       = rowData[this.__leftColumnId];
         var completed  = total - left;
 
         return ((completed / total) * 100).toFixed(2) + "%";
+    },
+
+    __calcRating : function(rowData) {
+        var up   = rowData[this.__totalUploadedColumnId];
+        var down = rowData[this.__totalDownloadedColumnId];
+
+        if (down == 0) return 0;
+        return (up / down).toFixed(2);
     },
 
     logSelectedRows: function() 
@@ -166,22 +237,35 @@ qx.Class.define("rhyacotriton.Table",
     },
 
 
+    __onDataAdded: function(/*qx.event.type.Data*/ event)
+    {
+      var data = event.getData();
+      
+      this.__tableModel.setDataAsMapArray(data.rows);
+
+      this.updateContent();
+    },
+
+
     __onDataRemoved: function(/*qx.event.type.Data*/ event)
     {
-      var id = event.getData().id;
-      console.log("Purge from the table entry by real id " + id);
-      
-      var pos = this.__tableModel.locate(this.__indexColumnId, id);
-      /* Purge data from the table. */
-      if (pos != 'undefined')
-        this.__tableModel.removeRows(pos, 1);
+      var rows = event.getData().rows;
+
+      for (var i in rows) {
+        console.log("Purge from the table entry by real id " + id);
+        var id = rows[i];
+        var pos = this.__tableModel.locate(this.__indexColumnId, id);
+        /* Purge data from the table. */
+        if (pos != 'undefined')
+          this.__tableModel.removeRows(pos, 1);
+      }
     },
 
 
     __onDataRemoveFailure: function(/*qx.event.type.Data*/ event)
     {
       var data = event.getOldData();
-      this.__tableModel.setRowsAsMapArray([data]);
+      this.__tableModel.addRowsAsMapArray([data]);
     },
 
 

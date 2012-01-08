@@ -64,11 +64,12 @@ qx.Class.define("rhyacotriton.store.Remote",
       var id = oldData.id;
       var newData = {"id": id};
       //this.fireDataEvent("dataRemoved", newData, oldData);
-      this.fireDataEvent("dataRemoveFailure", newData, oldData);
+      //this.fireDataEvent("dataRemoveFailure", newData, oldData);
+
+      this.sendJSON({"event" : "remove", "id" : id});
     },  
 
     stop : function(/*Array*/ ids) {
-        
     },  
 
     start : function(/*Array*/ ids) {

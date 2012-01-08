@@ -45,7 +45,7 @@ qx.Class.define("rhyacotriton.store.Abstract",
      *
      * The data is a map containing this properties:
      * <ul>
-     *   <li>id</li>
+     *   <li>rows (of ids)</li>
      * </ul>
      */
     "dataRemoved" : "qx.event.type.Data", 
@@ -68,6 +68,16 @@ qx.Class.define("rhyacotriton.store.Abstract",
      *   <li>rows</li>
      * </ul>
      */
-    "dataLoadCompleted" : "qx.event.type.Data"
+    "dataLoadCompleted" : "qx.event.type.Data",
+
+    /**
+     * Load a full set of data from server.
+     *
+     * The data is a map containing this properties:
+     * <ul>
+     *   <li>rows</li>
+     * </ul>
+     */
+    "dataAdded" : "qx.event.type.Data"
   }
 });
