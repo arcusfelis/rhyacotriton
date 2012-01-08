@@ -95,7 +95,7 @@ qx.Class.define("rhyacotriton.store.Remote",
           store.fireEvent("stateChanged");
         };
         bullet.onclose = function(){
-            console.log('WebSocket: closed');
+          console.log('WebSocket: closed');
 
           store.setActive(false);
           store.fireEvent("stateChanged");
@@ -111,7 +111,21 @@ qx.Class.define("rhyacotriton.store.Remote",
         }
     },
     __closeConnection : function() {
-        this.__bullet.close();
+        try {
+            this.__bullet.close();
+        } catch (err) {
+            console.log("There are some problems with bullet.");
+        }
+        // Cannot purge it fully.
+        // Avoid few connections.
+        this.__bullet.onclose = function() { 
+            console.log("Old connection was closed");
+        };
+        this.__bullet.onmessage = function() { 
+            console.log("FIXME: deads are alive.");
+        }
+        this.__bullet.onheartbeat = this.__bullet.onmessage;
+        this.__bullet.onclose = function() {};
         delete this.__bullet;
     }
 //this.fireDataEvent("columnVisibilityMenuCreateStart", data);

@@ -233,20 +233,6 @@ qx.Class.define("rhyacotriton.Table",
       return ids;
     },
 
-    removeSelectedRows: function() 
-    {
-      this.info("RemoveSelectedRows");
-
-      this.logSelectedRows();
-      var table = this;
-      this.__selectionModel.iterateSelection(function(pos) {
-        console.log("Position " + pos);
-        var row = table.__tableModel.getRowDataAsMap(pos);
-        table.__store.removeElement(row);
-        table.__tableModel.removeRows(pos, 1);
-      });
-    },
-
 
     startSelectedRows: function() 
     {
@@ -293,21 +279,37 @@ qx.Class.define("rhyacotriton.Table",
       this.updateContent();
     },
 
+    /* The event is from the user. */
+    removeSelectedRows: function() 
+    {
+      this.info("RemoveSelectedRows");
 
+      this.logSelectedRows();
+      var table = this;
+      // Extract ids, because iterator is not nice.
+      var ids = this.getSelectedIds();
+
+      this.__removeIds(ids);
+    },
+
+
+    /* The event is from the server. */
     __onDataRemoved: function(/*qx.event.type.Data*/ event)
     {
-      var rows = event.getData().rows;
+      var ids = event.getData().rows;
+      this.__removeIds(ids);
+    },
 
-      for (var i in rows) {
+    __removeIds: function(ids) {
+      for (var i in ids) {
         console.log("Purge from the table entry by real id " + id);
-        var id = rows[i];
+        var id = ids[i];
         var pos = this.__tableModel.locate(this.__indexColumnId, id);
         /* Purge data from the table. */
         if (pos != 'undefined')
           this.__tableModel.removeRows(pos, 1);
       }
     },
-
 
     __onDataRemoveFailure: function(/*qx.event.type.Data*/ event)
     {
