@@ -7,11 +7,6 @@ qx.Class.define("rhyacotriton.cellrenderer.Progress",
 {
   extend : qx.ui.table.cellrenderer.Conditional,
 
-  construct : function(calcFn)
-  {
-    this.__calcFn = calcFn;
-    this.base(arguments);
-  },
 
   members :
   {
@@ -19,7 +14,8 @@ qx.Class.define("rhyacotriton.cellrenderer.Progress",
 
     // overridden
     _getContentHtml : function(cellInfo) {
-      return this.__calcFn(cellInfo.rowData);
+      
+      return cellInfo.rowData[cellInfo.col] + "%";
     },
 
     // overridden

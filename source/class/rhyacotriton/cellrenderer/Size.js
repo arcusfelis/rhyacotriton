@@ -7,25 +7,13 @@ qx.Class.define("rhyacotriton.cellrenderer.Size",
 {
   extend : qx.ui.table.cellrenderer.Conditional,
 
-  construct : function(calcFn /*?*/)
-  {
-    if (typeof(calcFn) != "undefined")
-        this.__calcFn = calcFn;
-    this.base(arguments);
-  },
-
 
   members :
   {
-    __calcFn : undefined,
 
     // overridden
     _getContentHtml : function(cellInfo) {
-      var value; 
-      value = (typeof(this.__calcFn) == "undefined") 
-            ? cellInfo.rowData[cellInfo.col] 
-            : this.__calcFn(cellInfo.rowData);
-      return this.bytesToSize(value, 2);
+      return this.bytesToSize(cellInfo.rowData[cellInfo.col], 2);
     },
 
     // overridden

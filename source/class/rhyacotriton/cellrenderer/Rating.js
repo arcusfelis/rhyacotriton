@@ -7,19 +7,12 @@ qx.Class.define("rhyacotriton.cellrenderer.Rating",
 {
   extend : qx.ui.table.cellrenderer.Conditional,
 
-  construct : function(calcFn)
-  {
-    this.__calcFn = calcFn;
-    this.base(arguments);
-  },
 
   members :
   {
-    __calcFn : null,
-
     // overridden
     _getContentHtml : function(cellInfo) {
-      return this.__calcFn(cellInfo.rowData);
+      return cellInfo.rowData[cellInfo.col];
     },
 
     // overridden

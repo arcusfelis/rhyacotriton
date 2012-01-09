@@ -9,13 +9,9 @@ qx.Class.define("rhyacotriton.cellrenderer.Speed",
 
   members :
   {
-    __calcFn : undefined,
-
     // overridden
     _getContentHtml : function(cellInfo) {
-      var value; 
-      value = cellInfo.rowData[cellInfo.col];
-      return this.bytesToSize(value, 0);
+      return this.bytesToSize(cellInfo.rowData[cellInfo.col], 0);
     },
 
     // overridden
@@ -35,20 +31,13 @@ qx.Class.define("rhyacotriton.cellrenderer.Speed",
       if (isNaN(bytes) || (bytes == 0)) return '0';
 
       var kilobyte = 1024;
-      var megabyte = kilobyte * 1024;
-      var gigabyte = megabyte * 1024;
-      var terabyte = gigabyte * 1024;
 
      
       if ((bytes >= 0) && (bytes < kilobyte)) {
         return bytes + ' B/s';
-    
-      } else if ((bytes >= kilobyte) && (bytes < megabyte)) {
-        return (bytes / kilobyte).toFixed(precision) + ' KiB/s';
-    
       } else {
-        return (bytes / megabyte).toFixed(precision) + ' MiB/s';
-      }  
+        return (bytes / kilobyte).toFixed(precision) + ' KiB/s';
+      } 
    }
 
 

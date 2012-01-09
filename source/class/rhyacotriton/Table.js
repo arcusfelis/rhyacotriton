@@ -15,21 +15,46 @@ qx.Class.define("rhyacotriton.Table",
 
     // table model
     this.__tableModel = new smart.model.Default;
+    this.__columnsNameToCaption = {
+        "id"       : "Id",
+        "name"     : "Name",
+        "total"    : "Total",
+        "left"     : "Left",
+        "progress" : "Progress",
+        "rating"   : "Rating",
+        "online"   : "On-line",
+        "seeders"  : "Ss",
+        "leechers" : "Ls",
+        "state"    : "State",
+        "downloaded" : "In Now",
+        "uploaded" : "Out Now",
+        "all_time_downloaded" : "In Before",
+        "all_time_uploaded"   : "Out Before",
+        "sum_downloaded" : "Total In",
+        "sum_uploaded"   : "Total Out",
+        "speed_in"    : "Speed In",
+        "speed_out"   : "Speed Out"
+    },
+
+    this.__columnNums = [];
+    this.__columnNames = [];
+    this.__columnCaptions = [];
+
+    var i = 0;
+    for (var name in this.__columnsNameToCaption) {
+        var caption = this.__columnsNameToCaption[name];
+        this.__columnNums[name] = i;
+        this.__columnNames[i] = name;
+        this.__columnCaptions[i] = caption;
+        i++;
+    }
+    delete i;
+
+    console.dir(this.__columnCaptions);
+    console.dir(this.__columnNames);
     this.__tableModel.setColumns(
-        /*columnNameArr: */[ "Id", "Name", "Total", "Left", "Progress", "Rating",
-            "On-line", "Ss", "Ls", "State",
-            "In Now", "Out Now", 
-            "In Before", "Out Before",
-            "Total In", "Total Out",
-            "Speed In", "Speed Out"
-            ],
-        /*columnIdArr:   */[ "id", "name", "total", "left", "progress", "rating",
-            "online", "seeders",  "leechers", "state",
-            "downloaded", "uploaded",
-            "all_time_uploaded", "all_time_downloaded",
-            "sum_downloaded", "sum_uploaded",
-            "speed_in", "speed_out"
-            ]);
+        this.__columnCaptions,
+        this.__columnNames);
 
 
     // Install tableModel
@@ -95,16 +120,10 @@ qx.Class.define("rhyacotriton.Table",
     this.__tableColumnModel.setColumnWidth(this.__speedInColumnId, 70, true);
     this.__tableColumnModel.setColumnWidth(this.__speedOutColumnId, 70, true);
 
-    var progressProxy = function(rowData) {
-            return table.__calcProgress(rowData);
-        }
-    var ratingProxy = function(rowData) {
-            return table.__calcRating(rowData);
-        }
     this.__tableColumnModel.setDataCellRenderer(this.__progressColumnId,
-        new rhyacotriton.cellrenderer.Progress(progressProxy));
+        new rhyacotriton.cellrenderer.Progress());
     this.__tableColumnModel.setDataCellRenderer(this.__ratingColumnId,
-        new rhyacotriton.cellrenderer.Rating(ratingProxy));
+        new rhyacotriton.cellrenderer.Rating());
     this.__tableColumnModel.setDataCellRenderer(this.__onlineColumnId,
         new qx.ui.table.cellrenderer.Boolean());
     
@@ -114,21 +133,13 @@ qx.Class.define("rhyacotriton.Table",
     ,this.__uploadedColumnId
     ,this.__beforeDownloadedColumnId
     ,this.__beforeUploadedColumnId
+    ,this.__sumDownloadedColumnId
+    ,this.__sumUploadedColumnId
     ].map(function(id) {
         table.__tableColumnModel.setDataCellRenderer(id,
             new rhyacotriton.cellrenderer.Size());
     });
 
-    var sumDownProxy = function(rowData) {
-            return table.__calcSumDownloading(rowData);
-        }
-    var sumUpProxy = function(rowData) {
-            return table.__calcSumUploading(rowData);
-        }
-    table.__tableColumnModel.setDataCellRenderer(this.__sumDownloadedColumnId,
-        new rhyacotriton.cellrenderer.Size(sumDownProxy));
-    table.__tableColumnModel.setDataCellRenderer(this.__sumUploadedColumnId,
-        new rhyacotriton.cellrenderer.Size(sumUpProxy));
     table.__tableColumnModel.setDataCellRenderer(this.__speedInColumnId,
         new rhyacotriton.cellrenderer.Speed());
     table.__tableColumnModel.setDataCellRenderer(this.__speedOutColumnId,
@@ -198,7 +209,7 @@ qx.Class.define("rhyacotriton.Table",
         var left       = rowData[this.__leftColumnId];
         var completed  = total - left;
 
-        return ((completed / total) * 100).toFixed(2) + "%";
+        return ((completed / total) * 100).toFixed(2);
     },
 
     __calcRating : function(rowData) {
@@ -280,17 +291,28 @@ qx.Class.define("rhyacotriton.Table",
       {
         console.log("Is the table empty?");
       }
-      this.__tableModel.setDataAsMapArray(data.rows);
-
-      this.updateContent();
+      this.__setAllRows(data.rows);
     },
 
 
     __onDataAdded: function(/*qx.event.type.Data*/ event)
     {
       var data = event.getData();
+      this.__setAllRows(data);
+    },
+
+    __setAllRows: function(data)
+    {
+      var rows = [];
+
+      for (var i in data) {
+        var row = data[i];
+        rows[i] = this.__fillFields(row, []);
+      }
       
-      this.__tableModel.setDataAsMapArray(data.rows);
+      console.log("Bulk update.");
+      console.dir(rows);
+      this.__tableModel.setData(rows);
 
       this.updateContent();
     },
@@ -341,20 +363,49 @@ qx.Class.define("rhyacotriton.Table",
             if (typeof(row.id) == 'undefined')
                 this.error("Cannot get Rows[i].id");
 
+
             var pos = this.__tableModel.locate(this.__indexColumnId, row.id);
-            for (var j in row) {
-                if (j == "id") continue;
-                var columnId = this.__tableModel.getColumnIndexById(j);
-                this.__tableModel.setValue(columnId, pos, row[j]);
-            }
+            var oldValues = this.__tableModel.getRowData(pos, 
+                /*view*/ undefined, /*copy*/ false);
+            var newValues = oldValues.slice(0);
+
+            newValues = this.__fillFields(row, newValues);
+
+            /* There is moment, when pos can be changed as result of sorting. 
+               Good practice is to add a mutex, but we just decrease the time
+               when it can be recalculated.
+               */
+            pos = this.__tableModel.locate(this.__indexColumnId, row.id);
+            this.__tableModel.setRow(pos, newValues);
         }
     },
+
+    /**
+     * Set data from row (map from server) to newValues (row in the table).
+     */
+    __fillFields: function(row, newValues) 
+    {
+        for (var j in row) {
+            var cid = this.__columnNums[j];
+            newValues[cid] = row[j];
+        }
+        
+        newValues[this.__sumUploadedColumnId] = 
+            this.__calcSumUploading(newValues);
+        newValues[this.__sumDownloadedColumnId] = 
+            this.__calcSumDownloading(newValues);
+        newValues[this.__ratingColumnId] = this.__calcRating(newValues);
+        newValues[this.__progressColumnId] = this.__calcProgress(newValues);
+
+        return newValues;
+    },
+
 
     __onDataUpdated: function(/*qx.event.type.Data*/ event)
     {
       var data = event.getData();
       this.particallyUpdateRows(data.rows);
-      this.updateContent();
+//    this.updateContent();
     }
   }
 });
