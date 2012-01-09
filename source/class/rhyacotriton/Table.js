@@ -18,15 +18,17 @@ qx.Class.define("rhyacotriton.Table",
     this.__tableModel.setColumns(
         /*columnNameArr: */[ "Id", "Name", "Total", "Left", "Progress", "Rating",
             "On-line", "Ss", "Ls", "State",
-            "Downloaded Now", "Uploaded Now", 
-            "Uploaded Before", "Downloaded Before",
-            "Total downloaded", "Total uploaded"
+            "In Now", "Out Now", 
+            "In Before", "Out Before",
+            "Total In", "Total Out",
+            "Speed In", "Speed Out"
             ],
         /*columnIdArr:   */[ "id", "name", "total", "left", "progress", "rating",
             "online", "seeders",  "leechers", "state",
             "downloaded", "uploaded",
             "all_time_uploaded", "all_time_downloaded",
-            "sum_downloaded", "sum_uploaded"
+            "sum_downloaded", "sum_uploaded",
+            "speed_in", "speed_out"
             ]);
 
 
@@ -67,23 +69,31 @@ qx.Class.define("rhyacotriton.Table",
         this.__tableModel.getColumnIndexById("rating");
     this.__stateColumnId = 
         this.__tableModel.getColumnIndexById("state");
+    this.__speedInColumnId = 
+        this.__tableModel.getColumnIndexById("speed_in");
+    this.__speedOutColumnId = 
+        this.__tableModel.getColumnIndexById("speed_out");
 
 
 
-    this.__tableColumnModel.setColumnWidth(this.__nameColumnId, 300, true);
+    this.__tableColumnModel.setColumnWidth(this.__nameColumnId, 250, true);
     this.__tableColumnModel.setColumnWidth(this.__indexColumnId, 30, true);
-    this.__tableColumnModel.setColumnWidth(this.__progressColumnId, 70, true);
+    this.__tableColumnModel.setColumnWidth(this.__progressColumnId, 65, true);
     this.__tableColumnModel.setColumnWidth(this.__totalColumnId, 70, true);
     this.__tableColumnModel.setColumnWidth(this.__leftColumnId, 70, true);
     this.__tableColumnModel.setColumnWidth(this.__leechersColumnId, 40, true);
     this.__tableColumnModel.setColumnWidth(this.__seedersColumnId, 40, true);
     this.__tableColumnModel.setColumnWidth(this.__stateColumnId, 70, true);
-    this.__tableColumnModel.setColumnWidth(this.__ratingColumnId, 70, true);
+    this.__tableColumnModel.setColumnWidth(this.__ratingColumnId, 60, true);
     this.__tableColumnModel.setColumnWidth(this.__beforeDownloadedColumnId, 
-        70, true);
+        65, true);
     this.__tableColumnModel.setColumnWidth(this.__beforeUploadedColumnId, 70, true);
     this.__tableColumnModel.setColumnWidth(this.__downloadedColumnId, 70, true);
     this.__tableColumnModel.setColumnWidth(this.__uploadedColumnId, 70, true);
+    this.__tableColumnModel.setColumnWidth(this.__sumDownloadedColumnId, 70, true);
+    this.__tableColumnModel.setColumnWidth(this.__sumUploadedColumnId, 70, true);
+    this.__tableColumnModel.setColumnWidth(this.__speedInColumnId, 70, true);
+    this.__tableColumnModel.setColumnWidth(this.__speedOutColumnId, 70, true);
 
     var progressProxy = function(rowData) {
             return table.__calcProgress(rowData);
@@ -119,6 +129,10 @@ qx.Class.define("rhyacotriton.Table",
         new rhyacotriton.cellrenderer.Size(sumDownProxy));
     table.__tableColumnModel.setDataCellRenderer(this.__sumUploadedColumnId,
         new rhyacotriton.cellrenderer.Size(sumUpProxy));
+    table.__tableColumnModel.setDataCellRenderer(this.__speedInColumnId,
+        new rhyacotriton.cellrenderer.Speed());
+    table.__tableColumnModel.setDataCellRenderer(this.__speedOutColumnId,
+        new rhyacotriton.cellrenderer.Speed());
 
     [this.__leftColumnId
     ,this.__downloadedColumnId
@@ -172,6 +186,8 @@ qx.Class.define("rhyacotriton.Table",
     __uploadedColumnId: null,
     __sumDownloadedColumnId: null,
     __sumUploadedColumnId: null,
+    __speedInColumnId: null,
+    __speedOutColumnId: null,
 
     __tableModel : null,
     __tableColumnModel : null,
