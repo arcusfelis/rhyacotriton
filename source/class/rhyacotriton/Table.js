@@ -308,6 +308,8 @@ qx.Class.define("rhyacotriton.Table",
       for (var i in data) {
         var row = data[i];
         rows[i] = this.__fillFields(row, []);
+        rows[i][this.__speedInColumnId] = 0;
+        rows[i][this.__speedOutColumnId] = 0;
       }
       
       this.debug("Bulk update.");
