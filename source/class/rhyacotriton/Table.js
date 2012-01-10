@@ -50,8 +50,8 @@ qx.Class.define("rhyacotriton.Table",
     }
     delete i;
 
-    console.dir(this.__columnCaptions);
-    console.dir(this.__columnNames);
+    //console.dir(this.__columnCaptions);
+    //console.dir(this.__columnNames);
     this.__tableModel.setColumns(
         this.__columnCaptions,
         this.__columnNames);
@@ -289,19 +289,19 @@ qx.Class.define("rhyacotriton.Table",
       }
       catch (err)
       {
-        console.log("Is the table empty?");
+        this.debug("Is the table empty?");
       }
-      this.__setAllRows(data.rows);
+      this.__addRows(data.rows);
     },
 
 
     __onDataAdded: function(/*qx.event.type.Data*/ event)
     {
       var data = event.getData();
-      this.__setAllRows(data);
+      this.__addRows(data.rows);
     },
 
-    __setAllRows: function(data)
+    __addRows: function(data)
     {
       var rows = [];
 
@@ -310,9 +310,9 @@ qx.Class.define("rhyacotriton.Table",
         rows[i] = this.__fillFields(row, []);
       }
       
-      console.log("Bulk update.");
-      console.dir(rows);
-      this.__tableModel.setData(rows);
+      this.debug("Bulk update.");
+      //console.dir(rows);
+      this.__tableModel.addRows(rows, /*copy*/ true, /*fireEvent*/ false);
 
       this.updateContent();
     },
@@ -340,7 +340,7 @@ qx.Class.define("rhyacotriton.Table",
 
     __removeIds: function(ids) {
       for (var i in ids) {
-        console.log("Purge from the table entry by real id " + id);
+        this.debug("Purge from the table entry by real id " + id);
         var id = ids[i];
         var pos = this.__tableModel.locate(this.__indexColumnId, id);
         /* Purge data from the table. */
@@ -365,8 +365,17 @@ qx.Class.define("rhyacotriton.Table",
 
 
             var pos = this.__tableModel.locate(this.__indexColumnId, row.id);
+            if (isNaN(pos)) {
+                this.error("Cannot locate row.");
+                continue;
+            }
             var oldValues = this.__tableModel.getRowData(pos, 
                 /*view*/ undefined, /*copy*/ false);
+
+            if (typeof(oldValues) != "object") {
+                this.error("Cannot retrieve old values.");
+                continue;
+            }
             var newValues = oldValues.slice(0);
 
             newValues = this.__fillFields(row, newValues);
