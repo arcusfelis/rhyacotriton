@@ -62,7 +62,7 @@ qx.Class.define("rhyacotriton.store.Remote",
 
     removeElement : function(/*arrayMap*/ oldData) {
       var id = oldData.id;
-      var newData = {"id": id};
+      //var newData = {"id": id};
       //this.fireDataEvent("dataRemoved", newData, oldData);
       //this.fireDataEvent("dataRemoveFailure", newData, oldData);
 
@@ -70,10 +70,11 @@ qx.Class.define("rhyacotriton.store.Remote",
     },  
 
     stop : function(/*Array*/ ids) {
+      this.sendJSON({"event" : "pause", "ids" : ids});
     },  
 
     start : function(/*Array*/ ids) {
-      //this.fireDataEvent("dataUpdated", {"data": [{"id": 1, "name": "test"}]});
+      this.sendJSON({"event" : "continue", "ids" : ids});
     },
 
 
