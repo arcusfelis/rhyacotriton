@@ -12,8 +12,6 @@ qx.Class.define("rhyacotriton.Container",
 
   construct : function()
   {
-    var container = this;
-
     // Create main layout
     this.__mainLayout = new qx.ui.layout.Dock();
     this.base(arguments, this.__mainLayout);
@@ -27,26 +25,37 @@ qx.Class.define("rhyacotriton.Container",
     this.__toolBar = new rhyacotriton.ToolBar(this);
     this.add(this.__toolBar, {edge: "north"});
 
-    this.__store = new rhyacotriton.store.Remote;
-    this.__store.addListener("stateChanged", 
-      function(e) {
-        var isEnabled = e.getCurrentTarget().isActive();
-        container.setEnabled(isEnabled);
-      }, this.__store);
+    // Create side panel
+    this.__stack = new qx.ui.container.Stack;
+    this.__stack.setDecorator("main");
+    this.__stack.resetSelection();
+    this.__stack.setWidth(200);
+    this.__stack.exclude();
 
+    this.__filesView = new qx.ui.embed.Html("");
+    this.__peersView = new qx.ui.embed.Html("");
+    this.__logView = new qx.ui.embed.Html("");
+
+    this.__stack.add(this.__filesView);
+    this.__stack.add(this.__peersView);
+    this.__stack.add(this.__logView);
+
+
+    this._initStore();
     this.__table = new rhyacotriton.Table(this.__store);
     this.add(this.__table);
 
 
-    var selModel = this.__table.getSelectionModel();
+    this.__infosplit = new qx.ui.splitpane.Pane("horizontal");
+    this.__infosplit.setDecorator(null);
+    this.add(this.__infosplit);
 
-    // Register action for enabling the buttons when
-    // a row is selected.
-    selModel.addListener("changeSelection", 
-      function(e) {
-        var isEnabled = !(e.getCurrentTarget().isSelectionEmpty());
-        this.enableRowButtons(isEnabled);
-      }, this.__toolBar);
+    this.__infosplit.add(this.__table, 2);
+    this.__infosplit.add(this.__stack, 1);
+
+    
+
+    this._initToolbarButtonActivation();
 
     this.setEnabled(false); 
   },
@@ -58,6 +67,33 @@ qx.Class.define("rhyacotriton.Container",
     __store : null,
     __table : null,
     __commands : null,
+
+    _initStore: function() {
+      var container = this;
+
+      this.__store = new rhyacotriton.store.Remote;
+      this.__store.addListener("stateChanged", 
+        function(e) {
+          var isEnabled = e.getCurrentTarget().isActive();
+          container.setEnabled(isEnabled);
+        }, this.__store);
+    },
+
+    _initToolbarButtonActivation: function() {
+      var selModel = this.__table.getSelectionModel();
+     
+      // Register action for enabling the buttons when
+      // a row is selected.
+      selModel.addListener("changeSelection", 
+        function(e) {
+          var isEnabled = !(e.getCurrentTarget().isSelectionEmpty());
+          this.enableRowButtons(isEnabled);
+        }, this.__toolBar);
+    },
+
+
+
+
 
     /**
      * Delete selected rows from the table
@@ -120,12 +156,42 @@ qx.Class.define("rhyacotriton.Container",
 
       commands.stopSelectedRows = new qx.ui.core.Command("Control+P");
       commands.stopSelectedRows.addListener("execute", this.stopSelectedRows, this);
+
       this.__commands = commands;
     },
 
+    syncStackView : function(e) {
+      var selected = e.getData()[0];
+      var show = selected != null ? selected.getUserData("value") : "";
+      console.log("Show view: " + show);
+
+      switch(show)
+      {
+        case "files":
+          this.__stack.setSelection([this.__filesView]);
+          this.__stack.show();
+          break;
+
+        case "peers":
+          this.__stack.setSelection([this.__peersView]);
+          this.__stack.show();
+          break;
+
+        case "log":
+          this.__stack.setSelection([this.__logView]);
+          this.__stack.show();
+          break;
+
+        default:
+          this.__stack.resetSelection();
+          this.__stack.exclude();
+      }
+
+    },
+
     setEnabled : function(flag) {
-        this.__toolBar.setEnabled(flag);
-        this.__table.setEnabled(flag);
+      this.__toolBar.setEnabled(flag);
+      this.__table.setEnabled(flag);
     }
   }
 });

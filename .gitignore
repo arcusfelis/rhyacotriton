@@ -6,4 +6,5 @@ simulator/
 test/
 source/script
 cache/
+backup/
 *.swp

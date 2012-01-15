@@ -7,6 +7,7 @@
 #asset(qx/icon/Tango/22/actions/media-playback-start.png)
 #asset(qx/icon/Tango/22/actions/media-playback-pause.png)
 #asset(qx/icon/Tango/22/devices/network-wired.png)
+#asset(qx/icon/Tango/22/apps/utilities-log-viewer.png)
 
 ************************************************************************ */
 
@@ -60,6 +61,34 @@ qx.Class.define("rhyacotriton.ToolBar",
       "icon/22/actions/media-playback-pause.png");
     this.__stopBtn.setCommand(controller.getCommand("stopSelectedRows"));
     this.add(this.__stopBtn);
+
+    this.addSpacer();
+
+    this.__peersView = new qx.ui.toolbar.RadioButton(this.tr("Peers"), 
+      "");
+    this.__peersView.setUserData("value", "peers");
+    this.add(this.__peersView);
+
+    this.__filesView = new qx.ui.toolbar.RadioButton(this.tr("Files"), 
+      "");
+    this.__filesView.setUserData("value", "files");
+    this.add(this.__filesView);
+
+    this.__logView = new qx.ui.toolbar.RadioButton(this.tr("Log"), 
+      "icon/22/apps/utilities-log-viewer.png");
+    this.__logView.setUserData("value", "log");
+    this.add(this.__logView);
+
+
+
+    this.__viewGroup = new qx.ui.form.RadioGroup;
+    this.__viewGroup.setAllowEmptySelection(true);
+    this.__viewGroup.add(this.__logView);
+    this.__viewGroup.add(this.__filesView);
+    this.__viewGroup.add(this.__peersView);
+    this.__viewGroup.addListener("changeSelection", 
+        controller.syncStackView, controller);
+
 
     this.enableRowButtons(false);
   },
