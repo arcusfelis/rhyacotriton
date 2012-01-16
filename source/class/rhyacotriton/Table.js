@@ -3,19 +3,14 @@
  */
 qx.Class.define("rhyacotriton.Table",
 {
-  extend : qx.ui.table.Table,
+  extend : rhyacotriton.BasicTable,
 
   /**
    * @lint ignoreUndefined(qxc)
    */
   construct : function(store)
   {
-    this.__store = store;
-    var table = this;
-
-    // table model
-    this.__tableModel = new smart.model.Default;
-    this.__columnsNameToCaption = {
+    var n2c = {
         "id"       : "Id",
         "name"     : "Name",
         "total"    : "Total",
@@ -34,189 +29,95 @@ qx.Class.define("rhyacotriton.Table",
         "sum_uploaded"   : "Total Out",
         "speed_in"    : "Speed In",
         "speed_out"   : "Speed Out"
-    },
+    };
 
-    this.__columnNums = [];
-    this.__columnNames = [];
-    this.__columnCaptions = [];
+    this.base(arguments, n2c);
 
-    var i = 0;
-    for (var name in this.__columnsNameToCaption) {
-        var caption = this.__columnsNameToCaption[name];
-        this.__columnNums[name] = i;
-        this.__columnNames[i] = name;
-        this.__columnCaptions[i] = caption;
-        i++;
-    }
-    delete i;
+    var tcm = this.getTableColumnModel();
+    var n2p = this.getColumnNameToPositionIndex();
 
-    //console.dir(this.__columnCaptions);
-    //console.dir(this.__columnNames);
-    this.__tableModel.setColumns(
-        this.__columnCaptions,
-        this.__columnNames);
+    tcm.setColumnWidth(n2p.name, 250, true);
+    tcm.setColumnWidth(n2p.id, 30, true);
+    tcm.setColumnWidth(n2p.progress, 65, true);
+    tcm.setColumnWidth(n2p.total, 70, true);
+    tcm.setColumnWidth(n2p.left, 70, true);
+    tcm.setColumnWidth(n2p.leechers, 40, true);
+    tcm.setColumnWidth(n2p.seeders, 40, true);
+    tcm.setColumnWidth(n2p.state, 70, true);
+    tcm.setColumnWidth(n2p.rating, 60, true);
+    tcm.setColumnWidth(n2p.all_time_downloaded, 65, true);
+    tcm.setColumnWidth(n2p.all_time_uploaded, 70, true);
+    tcm.setColumnWidth(n2p.downloaded, 70, true);
+    tcm.setColumnWidth(n2p.uploaded, 70, true);
+    tcm.setColumnWidth(n2p.sum_downloaded, 70, true);
+    tcm.setColumnWidth(n2p.sum_uploaded, 70, true);
+    tcm.setColumnWidth(n2p.speed_in, 70, true);
+    tcm.setColumnWidth(n2p.speed_out, 70, true);
 
-
-    // Install tableModel
-    this.base(arguments, this.__tableModel);
-
-    this.__tableColumnModel = this.getTableColumnModel();
-
-    this.__indexColumnId = 
-        this.__tableModel.getColumnIndexById("id");
-    this.__nameColumnId = 
-        this.__tableModel.getColumnIndexById("name");
-    this.__onlineColumnId = 
-        this.__tableModel.getColumnIndexById("online");
-    this.__leftColumnId = 
-        this.__tableModel.getColumnIndexById("left");
-    this.__totalColumnId = 
-        this.__tableModel.getColumnIndexById("total");
-    this.__progressColumnId = 
-        this.__tableModel.getColumnIndexById("progress");
-    this.__leechersColumnId = 
-        this.__tableModel.getColumnIndexById("leechers");
-    this.__seedersColumnId = 
-        this.__tableModel.getColumnIndexById("seeders");
-    this.__downloadedColumnId = 
-        this.__tableModel.getColumnIndexById("downloaded");
-    this.__uploadedColumnId = 
-        this.__tableModel.getColumnIndexById("uploaded");
-    this.__sumDownloadedColumnId = 
-        this.__tableModel.getColumnIndexById("sum_downloaded");
-    this.__sumUploadedColumnId = 
-        this.__tableModel.getColumnIndexById("sum_uploaded");
-    this.__beforeDownloadedColumnId = 
-        this.__tableModel.getColumnIndexById("all_time_downloaded");
-    this.__beforeUploadedColumnId = 
-        this.__tableModel.getColumnIndexById("all_time_uploaded");
-    this.__ratingColumnId = 
-        this.__tableModel.getColumnIndexById("rating");
-    this.__stateColumnId = 
-        this.__tableModel.getColumnIndexById("state");
-    this.__speedInColumnId = 
-        this.__tableModel.getColumnIndexById("speed_in");
-    this.__speedOutColumnId = 
-        this.__tableModel.getColumnIndexById("speed_out");
-
-
-
-    this.__tableColumnModel.setColumnWidth(this.__nameColumnId, 250, true);
-    this.__tableColumnModel.setColumnWidth(this.__indexColumnId, 30, true);
-    this.__tableColumnModel.setColumnWidth(this.__progressColumnId, 65, true);
-    this.__tableColumnModel.setColumnWidth(this.__totalColumnId, 70, true);
-    this.__tableColumnModel.setColumnWidth(this.__leftColumnId, 70, true);
-    this.__tableColumnModel.setColumnWidth(this.__leechersColumnId, 40, true);
-    this.__tableColumnModel.setColumnWidth(this.__seedersColumnId, 40, true);
-    this.__tableColumnModel.setColumnWidth(this.__stateColumnId, 70, true);
-    this.__tableColumnModel.setColumnWidth(this.__ratingColumnId, 60, true);
-    this.__tableColumnModel.setColumnWidth(this.__beforeDownloadedColumnId, 
-        65, true);
-    this.__tableColumnModel.setColumnWidth(this.__beforeUploadedColumnId, 70, true);
-    this.__tableColumnModel.setColumnWidth(this.__downloadedColumnId, 70, true);
-    this.__tableColumnModel.setColumnWidth(this.__uploadedColumnId, 70, true);
-    this.__tableColumnModel.setColumnWidth(this.__sumDownloadedColumnId, 70, true);
-    this.__tableColumnModel.setColumnWidth(this.__sumUploadedColumnId, 70, true);
-    this.__tableColumnModel.setColumnWidth(this.__speedInColumnId, 70, true);
-    this.__tableColumnModel.setColumnWidth(this.__speedOutColumnId, 70, true);
-
-    this.__tableColumnModel.setDataCellRenderer(this.__progressColumnId,
+    tcm.setDataCellRenderer(n2p.progress,
         new rhyacotriton.cellrenderer.Progress());
-    this.__tableColumnModel.setDataCellRenderer(this.__ratingColumnId,
+    tcm.setDataCellRenderer(n2p.rating,
         new rhyacotriton.cellrenderer.Rating());
-    this.__tableColumnModel.setDataCellRenderer(this.__onlineColumnId,
+    tcm.setDataCellRenderer(this.online,
         new qx.ui.table.cellrenderer.Boolean());
     
-    [this.__totalColumnId
-    ,this.__leftColumnId
-    ,this.__downloadedColumnId
-    ,this.__uploadedColumnId
-    ,this.__beforeDownloadedColumnId
-    ,this.__beforeUploadedColumnId
-    ,this.__sumDownloadedColumnId
-    ,this.__sumUploadedColumnId
+    [n2p.total
+    ,n2p.left
+    ,n2p.downloaded
+    ,n2p.uploaded
+    ,n2p.all_time_downloaded
+    ,n2p.all_time_uploaded
+    ,n2p.sum_downloaded
+    ,n2p.sum_uploaded
     ].map(function(id) {
-        table.__tableColumnModel.setDataCellRenderer(id,
+        tcm.setDataCellRenderer(id,
             new rhyacotriton.cellrenderer.Size());
     });
 
-    table.__tableColumnModel.setDataCellRenderer(this.__speedInColumnId,
+    tcm.setDataCellRenderer(n2p.speed_in,
         new rhyacotriton.cellrenderer.Speed());
-    table.__tableColumnModel.setDataCellRenderer(this.__speedOutColumnId,
+    tcm.setDataCellRenderer(n2p.speed_out,
         new rhyacotriton.cellrenderer.Speed());
 
-    [this.__leftColumnId
-    ,this.__downloadedColumnId
-    ,this.__uploadedColumnId
-    ,this.__beforeDownloadedColumnId
-    ,this.__beforeUploadedColumnId
-    ,this.__onlineColumnId
+    [n2p.left
+    ,n2p.downloaded
+    ,n2p.uploaded
+    ,n2p.all_time_downloaded
+    ,n2p.all_time_uploaded
     ].map(function(id) {
-        table.__tableColumnModel.setColumnVisible(id, false);
+        tcm.setColumnVisible(id, false);
     });
 
-    // Get SelectionModel
-    this.__selectionModel = this.getSelectionModel();
-    this.__selectionModel.setSelectionMode(
-      qx.ui.table.selection.Model.MULTIPLE_INTERVAL_SELECTION
-    );
 
-    // Add the index to SmartTableModel
-    this.__tableModel.indexedSelection(this.__indexColumnId, 
-                                       this.__selectionModel);
-    this.__tableModel.addIndex(this.__indexColumnId);
-
-    this.__store.addListener("dataAdded", 
-        this.__onDataAdded, this);
-    this.__store.addListener("dataRemoved", 
-        this.__onDataRemoved, this);
-    this.__store.addListener("dataRemoveFailure", 
-            this.__onDataRemoveFailure, this);
-    this.__store.addListener("dataLoadCompleted", 
-            this.__onDataLoadCompleted, this);
-    this.__store.addListener("dataUpdated", 
-            this.__onDataUpdated, this);
+    var s = this.__store = store;
+    var e = this.getEventHandler;
+    s.addListener("dataAdded", e("dataAdded"), this);
+    s.addListener("dataRemoved", e("dataRemoved"), this);
+    s.addListener("dataRemoveFailure", e("dataRemoveFailure"), this);
+    s.addListener("dataLoadCompleted", e("dataLoadCompleted"), this);
+    s.addListener("dataUpdated", e("dataUpdated"), this);
   },
 
   members: {
-    __store: null,
-
-    __indexColumnId: null,
-    __nameColumnId: null,
-    __onlineColumnId: null,
-    __leftColumnId: null,
-    __totalColumnId: null,
-    __progressColumnId: null,
-    __leechersColumnId: null,
-    __seedersColumnId: null,
-    __stateColumnId: null,
-    __ratingColumnId: null,
-    __beforeDownloadedColumnId: null,
-    __beforeUploadedColumnId: null,
-    __downloadedColumnId: null,
-    __uploadedColumnId: null,
-    __sumDownloadedColumnId: null,
-    __sumUploadedColumnId: null,
-    __speedInColumnId: null,
-    __speedOutColumnId: null,
-
-    __tableModel : null,
-    __tableColumnModel : null,
-    __selectionModel : null,
+    __store : undefined,
 
     __calcProgress : function(rowData) {
-        var total      = rowData[this.__totalColumnId];
-        var left       = rowData[this.__leftColumnId];
+        var n2p = this.getColumnNameToPositionIndex();
+
+        var total      = rowData[n2p.total];
+        var left       = rowData[n2p.left];
         var completed  = total - left;
 
         return ((completed / total) * 100).toFixed(2);
     },
 
     __calcRating : function(rowData) {
-        var nowU    = rowData[this.__uploadedColumnId];
-        var nowD    = rowData[this.__downloadedColumnId];
-        var beforeU = rowData[this.__beforeUploadedColumnId];
-        var beforeD = rowData[this.__beforeDownloadedColumnId];
+        var n2p = this.getColumnNameToPositionIndex();
+
+        var nowU    = rowData[n2p.uploaded];
+        var nowD    = rowData[n2p.downloaded];
+        var beforeU = rowData[n2p.all_time_downloaded];
+        var beforeD = rowData[n2p.all_time_uploaded];
 
         var totalD = nowD + beforeD;
         var totalU = nowU + beforeU;
@@ -225,39 +126,21 @@ qx.Class.define("rhyacotriton.Table",
     },
 
     __calcSumDownloading : function(rowData) {
-        var now    = rowData[this.__downloadedColumnId];
-        var before = rowData[this.__beforeDownloadedColumnId];
+        var n2p = this.getColumnNameToPositionIndex();
+
+        var now    = rowData[n2p.downloaded];
+        var before = rowData[n2p.all_time_uploaded];
 
         return now+before;
     },
 
     __calcSumUploading : function(rowData) {
-        var now    = rowData[this.__uploadedColumnId];
-        var before = rowData[this.__beforeUploadedColumnId];
+        var n2p = this.getColumnNameToPositionIndex();
+
+        var now    = rowData[n2p.uploaded];
+        var before = rowData[n2p.all_time_downloaded];
 
         return now+before;
-    },
-
-    logSelectedRows: function() 
-    {
-      var tm = this.__tableModel;
-      this.__selectionModel.iterateSelection(function(pos) {
-        console.log("Position " + pos);
-        console.dir(tm.getRowData(pos));
-      });
-    },
-
-    /**
-     * Returns an array of object's ids.
-     */
-    getSelectedIds: function()
-    {
-      var ids = [];
-      var table = this;
-      this.__selectionModel.iterateSelection(function(pos) {
-        ids.push(table.__tableModel.getValue(table.__indexColumnId, pos));
-      });
-      return ids;
     },
 
 
@@ -275,148 +158,26 @@ qx.Class.define("rhyacotriton.Table",
     },
 
 
-    __onDataLoadCompleted: function(/*qx.event.type.Data*/ event)
-    {
-      var data = event.getData();
-      
-      try
-      {
-          this.__tableModel.removeRows(
-            /* startIndex */ 0, 
-            /* howMany */ undefined, 
-            /* view */ undefined, 
-            /* fireEvent */ false);
-      }
-      catch (err)
-      {
-        this.debug("Is the table empty?");
-      }
-      this.__addRows(data.rows);
-    },
-
-
-    __onDataAdded: function(/*qx.event.type.Data*/ event)
-    {
-      var data = event.getData();
-      this.__addRows(data.rows);
-    },
-
-    __addRows: function(data)
-    {
-      var rows = [];
-
-      for (var i in data) {
-        var row = data[i];
-        rows[i] = this.__fillFields(row, []);
-        rows[i][this.__speedInColumnId] = 0;
-        rows[i][this.__speedOutColumnId] = 0;
-      }
-      
-      this.debug("Bulk update.");
-      //console.dir(rows);
-      this.__tableModel.addRows(rows, /*copy*/ true, /*fireEvent*/ false);
-
-      this.updateContent();
-    },
-
-    /* The event is from the user. */
-    removeSelectedRows: function() 
-    {
-      this.info("RemoveSelectedRows");
-
-      this.logSelectedRows();
-      var table = this;
-      // Extract ids, because iterator is not nice.
-      var ids = this.getSelectedIds();
-
-      this.__removeIds(ids);
-    },
-
-
-    /* The event is from the server. */
-    __onDataRemoved: function(/*qx.event.type.Data*/ event)
-    {
-      var ids = event.getData().rows;
-      this.__removeIds(ids);
-    },
-
-    __removeIds: function(ids) {
-      for (var i in ids) {
-        this.debug("Purge from the table entry by real id " + id);
-        var id = ids[i];
-        var pos = this.__tableModel.locate(this.__indexColumnId, id);
-        /* Purge data from the table. */
-        if (pos != 'undefined')
-          this.__tableModel.removeRows(pos, 1);
-      }
-    },
-
-    __onDataRemoveFailure: function(/*qx.event.type.Data*/ event)
-    {
-      var data = event.getOldData();
-      this.__tableModel.addRowsAsMapArray([data]);
-    },
-
-
-    particallyUpdateRows: function(Rows)
-    {
-        for (var i = 0, count = Rows.length; i < count; i++) {
-            var row = Rows[i];
-            if (typeof(row.id) == 'undefined')
-                this.error("Cannot get Rows[i].id");
-
-
-            var pos = this.__tableModel.locate(this.__indexColumnId, row.id);
-            if (isNaN(pos)) {
-                this.error("Cannot locate row.");
-                continue;
-            }
-            var oldValues = this.__tableModel.getRowData(pos, 
-                /*view*/ undefined, /*copy*/ false);
-
-            if (typeof(oldValues) != "object") {
-                this.error("Cannot retrieve old values.");
-                continue;
-            }
-            var newValues = oldValues.slice(0);
-
-            newValues = this.__fillFields(row, newValues);
-
-            /* There is moment, when pos can be changed as result of sorting. 
-               Good practice is to add a mutex, but we just decrease the time
-               when it can be recalculated.
-               */
-            pos = this.__tableModel.locate(this.__indexColumnId, row.id);
-            this.__tableModel.setRow(pos, newValues);
-        }
-    },
-
     /**
      * Set data from row (map from server) to newValues (row in the table).
      */
-    __fillFields: function(row, newValues) 
+    fillFields: function(row, newValues, add) 
     {
-        for (var j in row) {
-            var cid = this.__columnNums[j];
-            newValues[cid] = row[j];
-        }
-        
-        newValues[this.__sumUploadedColumnId] = 
-            this.__calcSumUploading(newValues);
-        newValues[this.__sumDownloadedColumnId] = 
-            this.__calcSumDownloading(newValues);
-        newValues[this.__ratingColumnId] = this.__calcRating(newValues);
-        newValues[this.__progressColumnId] = this.__calcProgress(newValues);
+      newValues = this.base.fillFields(row, newValues);
+      var n2p = this.getColumnNameToPositionIndex();
+      
+      if (add) {
+        newValues[n2p.speed_id] = 0;
+        newValues[n2p.speed_out] = 0;
+      }
+      newValues[n2p.sum_uploaded] = 
+        this.__calcSumUploading(newValues);
+      newValues[n2p.sum_downloaded] = 
+        this.__calcSumDownloading(newValues);
+      newValues[n2p.rating] = this.__calcRating(newValues);
+      newValues[n2p.progress] = this.__calcProgress(newValues);
 
-        return newValues;
-    },
-
-
-    __onDataUpdated: function(/*qx.event.type.Data*/ event)
-    {
-      var data = event.getData();
-      this.particallyUpdateRows(data.rows);
-//    this.updateContent();
+      return newValues;
     }
   }
 });
