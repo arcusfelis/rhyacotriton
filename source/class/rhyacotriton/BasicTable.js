@@ -2,7 +2,7 @@
 /**
  * The GUI definition of the qooxdoo unit test runner.
  */
-qx.Class.define("rhyacotriton.CommonTable",
+qx.Class.define("rhyacotriton.BasicTable",
 {
   extend : qx.ui.table.Table,
 
@@ -11,19 +11,78 @@ qx.Class.define("rhyacotriton.CommonTable",
    */
   construct : function(names)
   {
-    this._initTableModel();
-    this.setColumnNames(names);
-    this._initSelectionModel();
-    this._initEventHandlers();
+    // INIT TABLE MODEL
+
+    // table model
+    this.__tableModel = new smart.model.Default;
+ 
+
+    // SET COLUMN NAMES (do it before running the base constructor)
+    this.__columnsNameToCaption = names;
+    
+    
+    this.__columnNums = [];
+    this.__columnNames = [];
+    this.__columnCaptions = [];
+    
+    var i = 0;
+    for (var name in this.__columnsNameToCaption) {
+        var caption = this.__columnsNameToCaption[name];
+        this.__columnNums[name] = i;
+        this.__columnNames[i] = name;
+        this.__columnCaptions[i] = caption;
+        i++;
+    }
+    delete i;
+    
+    this.__tableModel.setColumns(
+        this.__columnCaptions,
+        this.__columnNames);
+ 
+
+    // Install tableModel
+    this.base(arguments, this.__tableModel);
+
+
+
+    // INIT SELECTION MODEL
+
+    var sm = this.__selectionModel = this.getSelectionModel();
+    sm.setSelectionMode(
+      qx.ui.table.selection.Model.MULTIPLE_INTERVAL_SELECTION
+    );
+ 
+    var n2p = this.getColumnNameToPositionIndex();
+ 
+    var tm = this.__tableModel;
+    // Add the index to SmartTableModel
+    tm.indexedSelection(n2p.id, sm);
+    tm.addIndex(n2p.id);
+
+
+
+    // INIT EVENT HANDLERS
+
+    this.__eventHandlers = {
+      "dataAdded"         : this.__onDataAdded,
+      "dataRemoved"       : this.__onDataRemoved,
+      "dataRemoveFailure" : this.__onDataRemoveFailure,
+      "dataLoadCompleted" : this.__onDataLoadCompleted, 
+      "dataUpdated"       : this.__onDataUpdated
+    };
+
   },
 
 
   members: {
 
     __tableModel : null,
-    __tableColumnModel : null,
     __selectionModel : null,
+    __eventHandlers : null,
 
+    __columnNums : null,
+    __columnNames : null,
+    __columnCaptions : null,
 
     /**
      * INITIALIZATION PART
@@ -31,69 +90,10 @@ qx.Class.define("rhyacotriton.CommonTable",
 
 
     setColumnNames : function(names) {
-      this.__columnsNameToCaption = names;
-      
-      
-      this.__columnNums = [];
-      this.__columnNames = [];
-      this.__columnCaptions = [];
-      
-      var i = 0;
-      for (var name in this.__columnsNameToCaption) {
-          var caption = this.__columnsNameToCaption[name];
-          this.__columnNums[name] = i;
-          this.__columnNames[i] = name;
-          this.__columnCaptions[i] = caption;
-          i++;
-      }
-      delete i;
-      
-      this.__tableModel.setColumns(
-          this.__columnCaptions,
-          this.__columnNames);
 
     },
 
  
-    _initTableModel : function()
-    {
-      // table model
-      this.__tableModel = new smart.model.Default;
- 
-      // Install tableModel
-      this.base(arguments, this.__tableModel);
- 
-      this.__tableColumnModel = this.getTableColumnModel();
-    },
- 
- 
-    _initSelectionModel : function()
-    {
-      // Get SelectionModel
-      var sm = this.__selectionModel = this.getSelectionModel();
-      sm.setSelectionMode(
-        qx.ui.table.selection.Model.MULTIPLE_INTERVAL_SELECTION
-      );
- 
-      var n2p = this.getColumnNameToPositionIndex();
- 
-      var tm = this.__tableModel;
-      // Add the index to SmartTableModel
-      tm.indexedSelection(n2p.id, sm);
-      tm.addIndex(n2p.id);
-    },
-
-
-    _initEventHandlers: function()
-    {
-      this.__eventHandlers = {
-          "dataAdded"         : this.__onDataAdded,
-          "dataRemoved"       : this.__onDataRemoved,
-          "dataRemoveFailure" : this.__onDataRemoveFailure,
-          "dataLoadCompleted" : this.__onDataLoadCompleted, 
-          "dataUpdated"       : this.__onDataUpdated
-      };
-    },
 
     /**
      * HELPERS

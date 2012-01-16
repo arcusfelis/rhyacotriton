@@ -5,30 +5,27 @@ qx.Class.define("rhyacotriton.Table",
 {
   extend : rhyacotriton.BasicTable,
 
-  /**
-   * @lint ignoreUndefined(qxc)
-   */
   construct : function(store)
   {
     var n2c = {
-        "id"       : "Id",
-        "name"     : "Name",
-        "total"    : "Total",
-        "left"     : "Left",
-        "progress" : "Progress",
-        "rating"   : "Rating",
-        "online"   : "On-line",
-        "seeders"  : "Ss",
-        "leechers" : "Ls",
-        "state"    : "State",
-        "downloaded" : "In Now",
-        "uploaded" : "Out Now",
-        "all_time_downloaded" : "In Before",
-        "all_time_uploaded"   : "Out Before",
-        "sum_downloaded" : "Total In",
-        "sum_uploaded"   : "Total Out",
-        "speed_in"    : "Speed In",
-        "speed_out"   : "Speed Out"
+        "id"                   : this.tr("Id"),
+        "name"                 : this.tr("Name"),
+        "total"                : this.tr("Total"),
+        "left"                 : this.tr("Left"),
+        "progress"             : this.tr("Progress"),
+        "rating"               : this.tr("Rating"),
+        "online"               : this.tr("On-line"),
+        "seeders"              : this.tr("Ss"),
+        "leechers"             : this.tr("Ls"),
+        "state"                : this.tr("State"),
+        "downloaded"           : this.tr("In Now"),
+        "uploaded"             : this.tr("Out Now"),
+        "all_time_downloaded"  : this.tr("In Before"),
+        "all_time_uploaded"    : this.tr("Out Before"),
+        "sum_downloaded"       : this.tr("Total In"),
+        "sum_uploaded"         : this.tr("Total Out"),
+        "speed_in"             : this.tr("Speed In"),
+        "speed_out"            : this.tr("Speed Out")
     };
 
     this.base(arguments, n2c);
@@ -58,7 +55,7 @@ qx.Class.define("rhyacotriton.Table",
         new rhyacotriton.cellrenderer.Progress());
     tcm.setDataCellRenderer(n2p.rating,
         new rhyacotriton.cellrenderer.Rating());
-    tcm.setDataCellRenderer(this.online,
+    tcm.setDataCellRenderer(n2p.online,
         new qx.ui.table.cellrenderer.Boolean());
     
     [n2p.total
@@ -80,6 +77,7 @@ qx.Class.define("rhyacotriton.Table",
         new rhyacotriton.cellrenderer.Speed());
 
     [n2p.left
+    ,n2p.online
     ,n2p.downloaded
     ,n2p.uploaded
     ,n2p.all_time_downloaded
@@ -90,12 +88,16 @@ qx.Class.define("rhyacotriton.Table",
 
 
     var s = this.__store = store;
-    var e = this.getEventHandler;
-    s.addListener("dataAdded", e("dataAdded"), this);
-    s.addListener("dataRemoved", e("dataRemoved"), this);
-    s.addListener("dataRemoveFailure", e("dataRemoveFailure"), this);
-    s.addListener("dataLoadCompleted", e("dataLoadCompleted"), this);
-    s.addListener("dataUpdated", e("dataUpdated"), this);
+    s.addListener("dataAdded", 
+        this.getEventHandler("dataAdded"), this);
+    s.addListener("dataRemoved", 
+        this.getEventHandler("dataRemoved"), this);
+    s.addListener("dataRemoveFailure", 
+        this.getEventHandler("dataRemoveFailure"), this);
+    s.addListener("dataLoadCompleted", 
+        this.getEventHandler("dataLoadCompleted"), this);
+    s.addListener("dataUpdated", 
+        this.getEventHandler("dataUpdated"), this);
   },
 
   members: {
@@ -129,7 +131,7 @@ qx.Class.define("rhyacotriton.Table",
         var n2p = this.getColumnNameToPositionIndex();
 
         var now    = rowData[n2p.downloaded];
-        var before = rowData[n2p.all_time_uploaded];
+        var before = rowData[n2p.all_time_downloaded];
 
         return now+before;
     },
@@ -138,7 +140,7 @@ qx.Class.define("rhyacotriton.Table",
         var n2p = this.getColumnNameToPositionIndex();
 
         var now    = rowData[n2p.uploaded];
-        var before = rowData[n2p.all_time_downloaded];
+        var before = rowData[n2p.all_time_uploaded];
 
         return now+before;
     },
@@ -163,11 +165,11 @@ qx.Class.define("rhyacotriton.Table",
      */
     fillFields: function(row, newValues, add) 
     {
-      newValues = this.base.fillFields(row, newValues);
+      newValues = this.base(arguments, row, newValues, add);
       var n2p = this.getColumnNameToPositionIndex();
       
       if (add) {
-        newValues[n2p.speed_id] = 0;
+        newValues[n2p.speed_in] = 0;
         newValues[n2p.speed_out] = 0;
       }
       newValues[n2p.sum_uploaded] = 

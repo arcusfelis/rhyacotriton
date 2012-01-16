@@ -32,8 +32,10 @@ qx.Class.define("rhyacotriton.Container",
     this.__stack.setWidth(200);
     this.__stack.exclude();
 
+    this.__peersTable = new rhyacotriton.peers.Table(this.__store);
+
     this.__filesView = new qx.ui.embed.Html("");
-    this.__peersView = new qx.ui.embed.Html("");
+    this.__peersView = this.__peersTable;
     this.__logView = new qx.ui.embed.Html("");
 
     this.__stack.add(this.__filesView);
@@ -52,7 +54,6 @@ qx.Class.define("rhyacotriton.Container",
 
     this.__infosplit.add(this.__table, 2);
     this.__infosplit.add(this.__stack, 1);
-
     
 
     this._initToolbarButtonActivation();
