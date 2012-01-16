@@ -12,10 +12,12 @@ qx.Class.define("rhyacotriton.Container",
 
   construct : function()
   {
+
     // Create main layout
     this.__mainLayout = new qx.ui.layout.Dock();
     this.base(arguments, this.__mainLayout);
     this._initializeCommands();
+    this._initStore();
 
     // Create header
     this.__header = new rhyacotriton.Header();
@@ -43,7 +45,6 @@ qx.Class.define("rhyacotriton.Container",
     this.__stack.add(this.__logView);
 
 
-    this._initStore();
     this.__table = new rhyacotriton.Table(this.__store);
     this.add(this.__table);
 
@@ -174,6 +175,7 @@ qx.Class.define("rhyacotriton.Container",
           break;
 
         case "peers":
+          this.__store.reloadPeers();
           this.__stack.setSelection([this.__peersView]);
           this.__stack.show();
           break;

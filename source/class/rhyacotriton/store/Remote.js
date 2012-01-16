@@ -57,7 +57,11 @@ qx.Class.define("rhyacotriton.store.Remote",
      * Refresh the table
      */
     reload : function() {
-        this.sendText("get_entire_torrent_list");
+        this.sendText("all_torrents");
+    },
+
+    reloadPeers : function() {
+        this.sendText("all_peers");
     },
 
     removeElement : function(/*arrayMap*/ oldData) {
@@ -90,7 +94,7 @@ qx.Class.define("rhyacotriton.store.Remote",
         bullet.onopen = function(){
           console.log('WebSocket: opened');
 
-          store.sendText("get_entire_torrent_list");
+          store.sendText("all_torrents");
 
           store.setActive(true);
           store.fireEvent("stateChanged");

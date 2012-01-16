@@ -8,6 +8,9 @@
 #asset(qx/icon/Tango/22/actions/media-playback-pause.png)
 #asset(qx/icon/Tango/22/devices/network-wired.png)
 #asset(qx/icon/Tango/22/apps/utilities-log-viewer.png)
+#asset(qx/icon/Tango/22/apps/preferences-users.png)
+#asset(qx/icon/Tango/22/places/folder-open.png)
+
 
 ************************************************************************ */
 
@@ -65,12 +68,12 @@ qx.Class.define("rhyacotriton.ToolBar",
     this.addSpacer();
 
     this.__peersView = new qx.ui.toolbar.RadioButton(this.tr("Peers"), 
-      "");
+      "icon/22/apps/preferences-users.png");
     this.__peersView.setUserData("value", "peers");
     this.add(this.__peersView);
 
     this.__filesView = new qx.ui.toolbar.RadioButton(this.tr("Files"), 
-      "");
+      "icon/22/places/folder-open.png");
     this.__filesView.setUserData("value", "files");
     this.add(this.__filesView);
 

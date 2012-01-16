@@ -272,6 +272,13 @@ qx.Class.define("rhyacotriton.BasicTable",
     {
       var ids = event.getData().rows;
       this.__removeIds(ids);
+    },
+
+
+    __onDataUpdated: function(/*qx.event.type.Data*/ event)
+    {
+      var data = event.getData();
+      this.particallyUpdateRows(data.rows);
     }
   }
 });
