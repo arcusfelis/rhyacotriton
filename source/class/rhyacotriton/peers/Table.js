@@ -27,7 +27,7 @@ qx.Class.define("rhyacotriton.peers.Table",
     var n2p = this.getColumnNameToPositionIndex();
 
     tcm.setColumnWidth(n2p.id, 70, true);
-    tcm.setColumnWidth(n2p.ip, 90, true);
+    tcm.setColumnWidth(n2p.ip, 100, true);
     tcm.setColumnWidth(n2p.port, 50, true);
     tcm.setColumnWidth(n2p.torrent_id, 30, true);
     tcm.setColumnWidth(n2p.state, 60, true);
