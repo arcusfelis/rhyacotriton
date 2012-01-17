@@ -34,7 +34,9 @@ qx.Class.define("rhyacotriton.Container",
     this.__stack.setWidth(200);
     this.__stack.exclude();
 
-    this.__peersTable = new rhyacotriton.peers.Table(this.__store);
+    this.__table = new rhyacotriton.Table(this.__store);
+
+    this.__peersTable = new rhyacotriton.peers.Table(this.__store, this.__table);
 
     this.__filesView = new qx.ui.embed.Html("");
     this.__peersView = this.__peersTable;
@@ -45,7 +47,6 @@ qx.Class.define("rhyacotriton.Container",
     this.__stack.add(this.__logView);
 
 
-    this.__table = new rhyacotriton.Table(this.__store);
     this.add(this.__table);
 
 

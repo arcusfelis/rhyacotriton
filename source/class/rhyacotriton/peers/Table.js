@@ -8,7 +8,7 @@ qx.Class.define("rhyacotriton.peers.Table",
   /**
    * @lint ignoreUndefined(qxc)
    */
-  construct : function(store)
+  construct : function(store, torrents)
   {
     var n2c = {
         "id"             : this.tr("Pid"),
@@ -54,6 +54,28 @@ qx.Class.define("rhyacotriton.peers.Table",
 
     store.addListener("peerDataLoadCompleted", 
         this.getEventHandler("dataLoadCompleted"), this);
+
+
+
+    /* Filters */
+
+    var unfilteredView = tm.getView();
+    var filteredView = tm.addView(function(row) {
+        var tid = row[n2p.torrent_id];
+        var sel = torrents.getSelectedIds();
+        return (sel.indexOf(tid) != -1);
+    }, this);
+
+    torrents.getSelectionModel().addListener("changeSelection", function() {
+        console.log("change selection");
+        if (torrents.getSelectedIds().length == 0) {
+            this.setView(unfilteredView);
+        } else {
+            if (this.getView() != filteredView)
+                this.setView(filteredView);
+            this.updateView(filteredView);
+        }
+    }, tm);
   },
 
   members: {

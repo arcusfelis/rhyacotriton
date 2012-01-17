@@ -162,7 +162,7 @@ qx.Class.define("rhyacotriton.BasicTable",
         }
         var newValues = oldValues.slice(0);
 
-        newValues = this.fillFields(row, newValues, true);
+        newValues = this.fillFields(row, newValues, false);
 
         /* There is moment, when pos can be changed as result of sorting. 
            Good practice is to add a mutex, but we just decrease the time
@@ -202,6 +202,18 @@ qx.Class.define("rhyacotriton.BasicTable",
       this.__tableModel.addRows(rows, /*copy*/ true, /*fireEvent*/ false);
 
       this.updateContent();
+    },
+
+    
+    __removeIds: function(ids) {
+      for (var i in ids) {
+        console.log("Purge from the table entry by real id " + id);
+        var id = ids[i];
+        var pos = this.__tableModel.locate(this.__indexColumnId, id);
+        /* Purge data from the table. */
+        if (pos != 'undefined')
+          this.__tableModel.removeRows(pos, 1);
+      }
     },
 
 
