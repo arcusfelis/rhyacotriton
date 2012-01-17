@@ -118,8 +118,8 @@ qx.Class.define("rhyacotriton.Table",
 
         var nowU    = rowData[n2p.uploaded];
         var nowD    = rowData[n2p.downloaded];
-        var beforeU = rowData[n2p.all_time_downloaded];
-        var beforeD = rowData[n2p.all_time_uploaded];
+        var beforeU = rowData[n2p.all_time_uploaded];
+        var beforeD = rowData[n2p.all_time_downloaded];
 
         var totalD = nowD + beforeD;
         var totalU = nowU + beforeU;
