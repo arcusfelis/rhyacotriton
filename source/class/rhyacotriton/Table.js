@@ -56,29 +56,49 @@ qx.Class.define("rhyacotriton.Table",
     tcm.setColumnWidth(n2p.speed_in, 70, true);
     tcm.setColumnWidth(n2p.speed_out, 70, true);
 
-    tcm.setDataCellRenderer(n2p.progress, new rhyacotriton.cellrenderer.Progress());
+    tcm.setDataCellRenderer(n2p.progress, 
+      new rhyacotriton.cellrenderer.Progress());
     tcm.setDataCellRenderer(n2p.rating, new rhyacotriton.cellrenderer.Rating());
     tcm.setDataCellRenderer(n2p.online, new qx.ui.table.cellrenderer.Boolean());
 
-    [ n2p.total, n2p.left, n2p.downloaded, n2p.uploaded, n2p.all_time_downloaded, n2p.all_time_uploaded, n2p.sum_downloaded, n2p.sum_uploaded ].map(function(id) {
+    [ n2p.total
+    , n2p.left
+    , n2p.downloaded
+    , n2p.uploaded
+    , n2p.all_time_downloaded
+    , n2p.all_time_uploaded
+    , n2p.sum_downloaded
+    , n2p.sum_uploaded ].map(function(id) {
       tcm.setDataCellRenderer(id, new rhyacotriton.cellrenderer.Size());
     });
 
     tcm.setDataCellRenderer(n2p.speed_in, new rhyacotriton.cellrenderer.Speed());
     tcm.setDataCellRenderer(n2p.speed_out, new rhyacotriton.cellrenderer.Speed());
 
-    [ n2p.left, n2p.online, n2p.downloaded, n2p.uploaded, n2p.all_time_downloaded, n2p.all_time_uploaded ].map(function(id) {
+    [ n2p.left
+    , n2p.online
+    , n2p.downloaded
+    , n2p.uploaded
+    , n2p.all_time_downloaded
+    , n2p.all_time_uploaded ].map(function(id)
+    {
+      var id = visableColumns[i];
       tcm.setColumnVisible(id, false);
     });
 
     tm.setSortMethods(n2p.pid, store.buildPidComparator(n2p.pid));
 
     var s = this.__store = store;
-    s.addListener("dataAdded", this.getEventHandler("dataAdded"), this);
-    s.addListener("dataRemoved", this.getEventHandler("dataRemoved"), this);
-    s.addListener("dataRemoveFailure", this.getEventHandler("dataRemoveFailure"), this);
-    s.addListener("dataLoadCompleted", this.getEventHandler("dataLoadCompleted"), this);
-    s.addListener("dataUpdated", this.getEventHandler("dataUpdated"), this);
+    s.addListener("dataAdded", 
+      this.getEventHandler("dataAdded"), this);
+    s.addListener("dataRemoved", 
+      this.getEventHandler("dataRemoved"), this);
+    s.addListener("dataRemoveFailure", 
+      this.getEventHandler("dataRemoveFailure"), this);
+    s.addListener("dataLoadCompleted", 
+      this.getEventHandler("dataLoadCompleted"), this);
+    s.addListener("dataUpdated", 
+      this.getEventHandler("dataUpdated"), this);
   },
 
   members :

@@ -140,7 +140,8 @@ qx.Class.define("rhyacotriton.BasicTable",
       for (var i=0, count=Rows.length; i<count; i++)
       {
         var row = Rows[i];
-        if (typeof (row.id) == 'undefined') this.error("Cannot get Rows[i].id");
+        if (typeof (row.id) == 'undefined') 
+          this.error("Cannot get Rows[i].id");
 
         var pos = tm.locate(n2p.id, row.id);
 
@@ -266,7 +267,10 @@ qx.Class.define("rhyacotriton.BasicTable",
      * @return {var} TODOC
      */
     getEventHandler : function(name) {
-      return this.__eventHandlers[name];
+      var e = this.__eventHandlers[name];
+      if (typeof(e) == "undefined")
+        throw new Error("Bad name.");
+      return e;
     },
 
 

@@ -38,9 +38,12 @@ qx.Class.define("rhyacotriton.peers.Table",
     tcm.setColumnWidth(n2p.choke_state, 60, true);
     tcm.setColumnWidth(n2p.local_choke, 40, true);
 
-    tcm.setDataCellRenderer(n2p.local_choke, new qx.ui.table.cellrenderer.Boolean());
+    tcm.setDataCellRenderer(n2p.local_choke, 
+      new qx.ui.table.cellrenderer.Boolean());
 
-    [ n2p.interest_state, n2p.choke_state, n2p.local_choke ].map(function(id) {
+    [ n2p.interest_state
+    , n2p.choke_state
+    , n2p.local_choke ].map(function(id) {
       tcm.setColumnVisible(id, false);
     });
 
@@ -52,7 +55,8 @@ qx.Class.define("rhyacotriton.peers.Table",
     tm.setSortMethods(n2p.id, store.buildPidComparator(n2p.id));
     tm.setSortMethods(n2p.ip, store.buildIPComparator(n2p.ip));
 
-    store.addListener("peerDataLoadCompleted", this.getEventHandler("dataLoadCompleted"), this);
+    store.addListener("peerDataLoadCompleted", 
+      this.getEventHandler("dataLoadCompleted"), this);
 
     this.initFilters(torrents);
   },
