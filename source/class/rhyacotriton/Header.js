@@ -1,10 +1,13 @@
+
 /**
  * The Application's header
  */
-
 qx.Class.define("rhyacotriton.Header",
 {
   extend : qx.ui.container.Composite,
+
+
+
 
   /*
   *****************************************************************************
@@ -24,9 +27,7 @@ qx.Class.define("rhyacotriton.Header",
     version.setFont("default");
 
     this.add(title);
-    this.add(new qx.ui.core.Spacer, {flex : 1});
+    this.add(new qx.ui.core.Spacer, { flex : 1 });
     this.add(version);
-
   }
 });
-

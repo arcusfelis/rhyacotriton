@@ -23,6 +23,7 @@ qx.Class.define("rhyacotriton.Application",
 
 
 
+
   /*
   *****************************************************************************
      MEMBERS
@@ -34,7 +35,7 @@ qx.Class.define("rhyacotriton.Application",
     /**
      * This method contains the initial application code and gets called 
      * during startup of the application
-     * 
+     *
      * @lint ignoreDeprecated(alert)
      */
     main : function()
@@ -47,18 +48,23 @@ qx.Class.define("rhyacotriton.Application",
       {
         // support native logging capabilities, e.g. Firebug for Firefox
         qx.log.appender.Native;
+
         // support additional cross-browser console. Press F7 to toggle visibility
         qx.log.appender.Console;
       }
+
+
+
 
       /*
       -------------------------------------------------------------------------
         Below is your actual application code...
       -------------------------------------------------------------------------
       */
+
       // Initialize the compositor
       this.__container = new rhyacotriton.Container;
-      this.getRoot().add(this.__container, {edge: 0});
+      this.getRoot().add(this.__container, { edge : 0 });
     }
   }
 });

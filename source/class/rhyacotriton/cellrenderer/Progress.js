@@ -7,21 +7,30 @@ qx.Class.define("rhyacotriton.cellrenderer.Progress",
 {
   extend : qx.ui.table.cellrenderer.Conditional,
 
-
   members :
   {
     __calcFn : null,
 
     // overridden
+    /**
+     * TODOC
+     *
+     * @param cellInfo {var} TODOC
+     * @return {var} TODOC
+     */
     _getContentHtml : function(cellInfo) {
-      
       return cellInfo.rowData[cellInfo.col] + "%";
     },
 
     // overridden
+    /**
+     * TODOC
+     *
+     * @param cellInfo {var} TODOC
+     * @return {string} TODOC
+     */
     _getCellClass : function(cellInfo) {
       return "qooxdoo-table-cell-right qooxdoo-table-cell";
     }
   }
-}); 
-
+});

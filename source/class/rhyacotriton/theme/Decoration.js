@@ -10,9 +10,6 @@
 
 qx.Theme.define("rhyacotriton.theme.Decoration",
 {
-  extend : qx.theme.modern.Decoration,
-
-  decorations :
-  {
-  }
+  extend      : qx.theme.modern.Decoration,
+  decorations : {}
 });

@@ -1,3 +1,4 @@
+
 /**
  * The GUI definition of the qooxdoo unit test runner.
  */
@@ -5,20 +6,22 @@ qx.Class.define("rhyacotriton.peers.Table",
 {
   extend : rhyacotriton.BasicTable,
 
+
   /**
    * @lint ignoreUndefined(qxc)
    */
   construct : function(store, torrents)
   {
-    var n2c = {
-        "id"             : this.tr("Pid"),
-        "torrent_id"     : this.tr("Id"),
-        "ip"             : this.tr("IP"),
-        "port"           : this.tr("Port"),
-        "state"          : this.tr("State"),
-        "choke_state"    : this.tr("Choking"),
-        "interest_state" : this.tr("Intersted"),
-        "local_choke"    : this.tr("Is choking?")
+    var n2c =
+    {
+      "id"             : this.tr("Pid"),
+      "torrent_id"     : this.tr("Id"),
+      "ip"             : this.tr("IP"),
+      "port"           : this.tr("Port"),
+      "state"          : this.tr("State"),
+      "choke_state"    : this.tr("Choking"),
+      "interest_state" : this.tr("Intersted"),
+      "local_choke"    : this.tr("Is choking?")
     };
 
     this.base(arguments, n2c);
@@ -35,30 +38,24 @@ qx.Class.define("rhyacotriton.peers.Table",
     tcm.setColumnWidth(n2p.choke_state, 60, true);
     tcm.setColumnWidth(n2p.local_choke, 40, true);
 
-    tcm.setDataCellRenderer(n2p.local_choke,
-        new qx.ui.table.cellrenderer.Boolean());
+    tcm.setDataCellRenderer(n2p.local_choke, new qx.ui.table.cellrenderer.Boolean());
 
-    [n2p.interest_state
-    ,n2p.choke_state
-    ,n2p.local_choke
-    ].map(function(id) {
-        tcm.setColumnVisible(id, false);
+    [ n2p.interest_state, n2p.choke_state, n2p.local_choke ].map(function(id) {
+      tcm.setColumnVisible(id, false);
     });
 
     var tm = this.getTableModel();
 
     /* Set the special order of sorting in the table for composite types 
        of data. */
+
     tm.setSortMethods(n2p.id, store.buildPidComparator(n2p.id));
     tm.setSortMethods(n2p.ip, store.buildIPComparator(n2p.ip));
 
-    store.addListener("peerDataLoadCompleted", 
-        this.getEventHandler("dataLoadCompleted"), this);
-
+    store.addListener("peerDataLoadCompleted", this.getEventHandler("dataLoadCompleted"), this);
 
     this.initFilters(torrents);
   },
 
-  members: {
-  }
+  members : {}
 });
