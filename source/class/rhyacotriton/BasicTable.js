@@ -188,7 +188,7 @@ qx.Class.define("rhyacotriton.BasicTable",
     },
 
 
-    __addRows: function(data)
+    addRows: function(data)
     {
       var rows = [];
 
@@ -198,7 +198,6 @@ qx.Class.define("rhyacotriton.BasicTable",
       }
       
       this.debug("Bulk update.");
-      //console.dir(rows);
       this.__tableModel.addRows(rows, /*copy*/ true, /*fireEvent*/ false);
 
       this.updateContent();
@@ -207,7 +206,7 @@ qx.Class.define("rhyacotriton.BasicTable",
     
     __removeIds: function(ids) {
       for (var i in ids) {
-        console.log("Purge from the table entry by real id " + id);
+        this.info("Purge from the table entry by real id " + id);
         var id = ids[i];
         var pos = this.__tableModel.locate(this.__indexColumnId, id);
         /* Purge data from the table. */
@@ -268,14 +267,14 @@ qx.Class.define("rhyacotriton.BasicTable",
       {
         this.debug("Is the table empty?");
       }
-      this.__addRows(data.rows);
+      this.addRows(data.rows);
     },
 
 
     __onDataAdded: function(/*qx.event.type.Data*/ event)
     {
       var data = event.getData();
-      this.__addRows(data.rows);
+      this.addRows(data.rows);
     },
 
 
@@ -291,6 +290,38 @@ qx.Class.define("rhyacotriton.BasicTable",
     {
       var data = event.getData();
       this.particallyUpdateRows(data.rows);
-    }
+    },
+
+   
+  __oldSelection : [],
+  initFilters : function(torrents)
+  {
+    var n2p = this.getColumnNameToPositionIndex();
+    var tm = this.getTableModel();
+
+    var unfilteredView = tm.getView();
+    var filteredView = tm.addView(function(row) {
+      var tid = row[n2p.torrent_id];
+      return (this.__oldSelection.indexOf(tid) != -1);
+    }, this);
+
+    torrents.getSelectionModel().addListener("changeSelection", function() {
+      this.info("change selection");
+
+      var newSel = torrents.getSelectedIds();
+      if (this.__oldSelection == newSel)
+        return;
+
+      this.__oldSelection = newSel;
+
+      if (newSel.length == 0) {
+        tm.setView(unfilteredView);
+      } else {
+        if (tm.getView() != filteredView)
+          tm.setView(filteredView);
+        tm.updateView(filteredView);
+      }
+    }, this);
   }
+ }
 });

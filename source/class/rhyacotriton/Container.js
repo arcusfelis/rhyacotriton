@@ -37,10 +37,11 @@ qx.Class.define("rhyacotriton.Container",
     this.__table = new rhyacotriton.Table(this.__store);
 
     this.__peersTable = new rhyacotriton.peers.Table(this.__store, this.__table);
+    this.__logTable   = new rhyacotriton.log.Table(this.__store, this.__table);
 
     this.__filesView = new qx.ui.embed.Html("");
     this.__peersView = this.__peersTable;
-    this.__logView = new qx.ui.embed.Html("");
+    this.__logView = this.__logTable;
 
     this.__stack.add(this.__filesView);
     this.__stack.add(this.__peersView);
@@ -166,7 +167,7 @@ qx.Class.define("rhyacotriton.Container",
     syncStackView : function(e) {
       var selected = e.getData()[0];
       var show = selected != null ? selected.getUserData("value") : "";
-      console.log("Show view: " + show);
+      this.info("Show view: " + show);
 
       switch(show)
       {
