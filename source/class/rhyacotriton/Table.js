@@ -82,7 +82,6 @@ qx.Class.define("rhyacotriton.Table",
     , n2p.all_time_downloaded
     , n2p.all_time_uploaded ].map(function(id)
     {
-      var id = visableColumns[i];
       tcm.setColumnVisible(id, false);
     });
 

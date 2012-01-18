@@ -269,7 +269,7 @@ qx.Class.define("rhyacotriton.BasicTable",
     getEventHandler : function(name) {
       var e = this.__eventHandlers[name];
       if (typeof(e) == "undefined")
-        throw new Error("Bad name.");
+        throw new Error("Bad name " + name);
       return e;
     },
 
@@ -315,10 +315,9 @@ qx.Class.define("rhyacotriton.BasicTable",
       this.addRows(data.rows);
     },
 
-    /* The event is from the server. */
 
     /**
-     * TODOC
+     * The event is from the server. 
      *
      * @param event {qx.event.type.Data} TODOC
      */
@@ -334,6 +333,18 @@ qx.Class.define("rhyacotriton.BasicTable",
      *
      * @param event {qx.event.type.Data} TODOC
      */
+    __onDataRemoveFailure: function(event)
+    {
+      var data = event.getOldData();
+      this.__tableModel.addRowsAsMapArray([data]);
+    },
+
+
+    /**
+     * TODOC
+     *
+     * @param event {qx.event.type.Data} TODOC
+     */
     __onDataUpdated : function(event)
     {
       var data = event.getData();
@@ -341,29 +352,32 @@ qx.Class.define("rhyacotriton.BasicTable",
     },
 
     __oldSelection : [],
-
+    __unfilteredView : undefined,
+    __filteredView : undefined,
+    __mainTable : undefined,
 
     /**
      * TODOC
      *
-     * @param torrents {var} TODOC
+     * @param main {var} Table with torrents
      */
-    initFilters : function(torrents)
+    initFilters : function(main)
     {
       var n2p = this.getColumnNameToPositionIndex();
       var tm = this.getTableModel();
+      this.__mainTable = main;
 
-      var unfilteredView = tm.getView();
+      this.__unfilteredView = tm.getView();
 
-      var filteredView = tm.addView(function(row)
+      this.__filteredView = tm.addView(function(row)
       {
         var tid = row[n2p.torrent_id];
         return (this.__oldSelection.indexOf(tid) != -1);
       },
       this);
 
-      var tsm = torrents.getSelectionModel();
-      tsm.addListener("changeSelection", this.updateFilters, this);
+      var msm = main.getSelectionModel();
+      msm.addListener("changeSelection", this.updateFilters, this);
     },
 
 
@@ -371,23 +385,24 @@ qx.Class.define("rhyacotriton.BasicTable",
      * TODOC
      *
      */
-    updateFilters : function()
+    updateFilters : function(e)
     {
       this.info("change selection");
-      var tm = this.__tableModel;
+      var tm = this.__tableModel; 
 
-      var newSel = torrents.getSelectedIds();
+      var newSel = this.__mainTable.getSelectedIds();
       if (this.__oldSelection == newSel) return;
 
       this.__oldSelection = newSel;
 
       if (newSel.length == 0) {
-        tm.setView(unfilteredView);
+        tm.setView(this.__unfilteredView);
       }
       else
       {
-        if (tm.getView() != filteredView) tm.setView(filteredView);
-        tm.updateView(filteredView);
+        if (tm.getView() != this.__filteredView) 
+          tm.setView(this.__filteredView);
+        tm.updateView(this.__filteredView);
       }
     }
   }

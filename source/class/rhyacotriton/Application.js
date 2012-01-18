@@ -44,14 +44,15 @@ qx.Class.define("rhyacotriton.Application",
       this.base(arguments);
 
       // Enable logging in debug variant
-      if (qx.core.Environment.get("qx.debug"))
-      {
+//    if (qx.core.Environment.get("qx.debug"))
+//    {
         // support native logging capabilities, e.g. Firebug for Firefox
         qx.log.appender.Native;
 
-        // support additional cross-browser console. Press F7 to toggle visibility
-        qx.log.appender.Console;
-      }
+        // support additional cross-browser console. 
+        // Press F7 to toggle visibility
+//      qx.log.appender.Console;
+//    }
 
 
 
