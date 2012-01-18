@@ -9,6 +9,7 @@ qx.Class.define("rhyacotriton.Table",
   {
     var n2c = {
         "id"                   : this.tr("Id"),
+        "pid"                  : this.tr("Pid"),
         "name"                 : this.tr("Name"),
         "total"                : this.tr("Total"),
         "left"                 : this.tr("Left"),
@@ -30,11 +31,13 @@ qx.Class.define("rhyacotriton.Table",
 
     this.base(arguments, n2c);
 
+    var tm  = this.getTableModel();
     var tcm = this.getTableColumnModel();
     var n2p = this.getColumnNameToPositionIndex();
 
     tcm.setColumnWidth(n2p.name, 250, true);
     tcm.setColumnWidth(n2p.id, 30, true);
+    tcm.setColumnWidth(n2p.pid, 70, true);
     tcm.setColumnWidth(n2p.progress, 65, true);
     tcm.setColumnWidth(n2p.total, 70, true);
     tcm.setColumnWidth(n2p.left, 70, true);
@@ -86,6 +89,7 @@ qx.Class.define("rhyacotriton.Table",
         tcm.setColumnVisible(id, false);
     });
 
+    tm.setSortMethods(n2p.pid, store.buildPidComparator(n2p.pid));
 
     var s = this.__store = store;
     s.addListener("dataAdded", 
