@@ -39,7 +39,11 @@ qx.Class.define("rhyacotriton.BasicTable",
     this.__tableModel.setColumns(this.__columnCaptions, this.__columnNames);
 
     // Install tableModel
-    this.base(arguments, this.__tableModel);
+    this.base(arguments, this.__tableModel, {
+        tableColumnModel : function(obj) {
+          return new qx.ui.table.columnmodel.Resize(obj);
+        }
+    });
 
     // INIT SELECTION MODEL
     var sm = this.__selectionModel = this.getSelectionModel();
@@ -152,7 +156,6 @@ qx.Class.define("rhyacotriton.BasicTable",
         }
 
         var oldValues = tm.getRowData(pos,
-
         /* view */ undefined, /* copy */ false);
 
         if (typeof (oldValues) != "object")
@@ -161,7 +164,7 @@ qx.Class.define("rhyacotriton.BasicTable",
           continue;
         }
 
-        var newValues = oldValues.slice(0);
+        var newValues = qx.lang.Array.clone(oldValues);
 
         newValues = this.fillFields(row, newValues, false);
 
@@ -391,9 +394,9 @@ qx.Class.define("rhyacotriton.BasicTable",
       var tm = this.__tableModel; 
 
       var newSel = this.__mainTable.getSelectedIds();
-      if (this.__oldSelection == newSel) return;
+      if (qx.lang.Array.equals(this.__oldSelection, newSel)) return;
 
-      this.__oldSelection = newSel;
+      this.__oldSelection = qx.lang.Array.clone(newSel);
 
       if (newSel.length == 0) {
         tm.setView(this.__unfilteredView);

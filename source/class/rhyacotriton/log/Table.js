@@ -25,10 +25,12 @@ qx.Class.define("rhyacotriton.log.Table",
     var tcm = this.getTableColumnModel();
     var n2p = this.getColumnNameToPositionIndex();
 
-    tcm.setColumnWidth(n2p.torrent_id, 30, true);
-    tcm.setColumnWidth(n2p.time, 55, true);
-    tcm.setColumnWidth(n2p.name, 90, true);
-    tcm.setColumnWidth(n2p.message, 130, true);
+    var rb = tcm.getBehavior();
+
+    rb.set(n2p.torrent_id, { width:"1*", minWidth: 30 });
+    rb.set(n2p.time,       { width:"1*", minWidth: 55 });
+    rb.set(n2p.name,       { width:"1*", minWidth: 90 });
+    rb.set(n2p.message,    { width:"1*", minWidth: 130 });
 
     var tm = this.getTableModel();
     var timeRenderer = new qx.ui.table.cellrenderer.Date();

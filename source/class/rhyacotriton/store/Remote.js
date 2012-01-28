@@ -128,6 +128,25 @@ qx.Class.define("rhyacotriton.store.Remote",
       });
     },
 
+    getFileTreeNode : function(tid, nid) 
+    {
+      this.sendJSON(
+      {
+        "event"      : "file_info",
+        "torrent_id" : tid,
+        "parent_id"  : nid
+      });
+    },
+
+    wishSelectedFiles : function(tid, nids) 
+    {
+      this.sendJSON(
+      {
+        "event"      : "wish_files",
+        "torrent_id" : tid,
+        "file_ids"   : nids
+      });
+    },
 
     /**
      * TODOC

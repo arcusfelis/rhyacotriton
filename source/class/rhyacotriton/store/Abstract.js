@@ -87,6 +87,9 @@ qx.Class.define("rhyacotriton.store.Abstract",
     },
 
 
+    getFileTreeNode : function(tid, nid) {},
+    wishSelectedFiles : function(tid, nids) {},
+
     /**
      * This functions allows to sort pids in the table.
      *
@@ -191,6 +194,14 @@ qx.Class.define("rhyacotriton.store.Abstract",
      */
     "dataLoadCompleted"     : "qx.event.type.Data",
     "peerDataLoadCompleted" : "qx.event.type.Data",
+    /*
+     * <ul>
+     *   <li>torrent_id</li>
+     *   <li>parent</li>
+     *   <li>nodes</li>
+     * </ul>
+     */
+    "fileDataLoadCompleted" : "qx.event.type.Data",
 
 
     /**

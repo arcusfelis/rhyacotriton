@@ -37,24 +37,26 @@ qx.Class.define("rhyacotriton.Table",
     var tcm = this.getTableColumnModel();
     var n2p = this.getColumnNameToPositionIndex();
 
-    tcm.setColumnWidth(n2p.name, 250, true);
-    tcm.setColumnWidth(n2p.id, 30, true);
-    tcm.setColumnWidth(n2p.pid, 70, true);
-    tcm.setColumnWidth(n2p.progress, 65, true);
-    tcm.setColumnWidth(n2p.total, 70, true);
-    tcm.setColumnWidth(n2p.left, 70, true);
-    tcm.setColumnWidth(n2p.leechers, 40, true);
-    tcm.setColumnWidth(n2p.seeders, 40, true);
-    tcm.setColumnWidth(n2p.state, 70, true);
-    tcm.setColumnWidth(n2p.rating, 60, true);
-    tcm.setColumnWidth(n2p.all_time_downloaded, 65, true);
-    tcm.setColumnWidth(n2p.all_time_uploaded, 70, true);
-    tcm.setColumnWidth(n2p.downloaded, 70, true);
-    tcm.setColumnWidth(n2p.uploaded, 70, true);
-    tcm.setColumnWidth(n2p.sum_downloaded, 70, true);
-    tcm.setColumnWidth(n2p.sum_uploaded, 70, true);
-    tcm.setColumnWidth(n2p.speed_in, 70, true);
-    tcm.setColumnWidth(n2p.speed_out, 70, true);
+    var rb = tcm.getBehavior();
+
+    rb.set(n2p.name,      { width:"1*", minWidth: 250 });
+    rb.set(n2p.id,        { width:"1*", minWidth: 30 });
+    rb.set(n2p.pid,       { width:"1*", minWidth: 70 });
+    rb.set(n2p.progress,  { width:"1*", minWidth: 65 });
+    rb.set(n2p.total,     { width:"1*", minWidth: 70 });
+    rb.set(n2p.left,      { width:"1*", minWidth: 70 });
+    rb.set(n2p.leechers,  { width:"1*", minWidth: 40 });
+    rb.set(n2p.seeders,   { width:"1*", minWidth: 40 });
+    rb.set(n2p.state,     { width:"1*", minWidth: 70 });
+    rb.set(n2p.rating,    { width:"1*", minWidth: 60 });
+    rb.set(n2p.downloaded,{ width:"1*", minWidth: 70 });
+    rb.set(n2p.uploaded,  { width:"1*", minWidth: 70 });
+    rb.set(n2p.speed_in,  { width:"1*", minWidth: 70 });
+    rb.set(n2p.speed_out, { width:"1*", minWidth: 70 });
+    rb.set(n2p.all_time_downloaded, { width:"1*", minWidth: 65 });
+    rb.set(n2p.all_time_uploaded,   { width:"1*", minWidth: 70 });
+    rb.set(n2p.sum_downloaded,      { width:"1*", minWidth: 70 });
+    rb.set(n2p.sum_uploaded,        { width:"1*", minWidth: 70 });
 
     tcm.setDataCellRenderer(n2p.progress, 
       new rhyacotriton.cellrenderer.Progress());
@@ -119,7 +121,7 @@ qx.Class.define("rhyacotriton.Table",
       var left = rowData[n2p.left];
       var completed = total - left;
 
-      return ((completed / total) * 100).toFixed(2);
+      return (completed / total);
     },
 
 

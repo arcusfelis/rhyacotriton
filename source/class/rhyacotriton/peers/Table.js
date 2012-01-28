@@ -29,14 +29,16 @@ qx.Class.define("rhyacotriton.peers.Table",
     var tcm = this.getTableColumnModel();
     var n2p = this.getColumnNameToPositionIndex();
 
-    tcm.setColumnWidth(n2p.id, 70, true);
-    tcm.setColumnWidth(n2p.ip, 100, true);
-    tcm.setColumnWidth(n2p.port, 50, true);
-    tcm.setColumnWidth(n2p.torrent_id, 30, true);
-    tcm.setColumnWidth(n2p.state, 60, true);
-    tcm.setColumnWidth(n2p.interest_state, 60, true);
-    tcm.setColumnWidth(n2p.choke_state, 60, true);
-    tcm.setColumnWidth(n2p.local_choke, 40, true);
+    var rb = tcm.getBehavior();
+
+    rb.set(n2p.id,               { width:"1*", minWidth: 70 });
+    rb.set(n2p.ip,               { width:"1*", minWidth: 100 });
+    rb.set(n2p.port,             { width:"1*", minWidth: 50 });
+    rb.set(n2p.torrent_id,       { width:"1*", minWidth: 30 });
+    rb.set(n2p.state,            { width:"1*", minWidth: 60 });
+    rb.set(n2p.interest_state,   { width:"1*", minWidth: 60 });
+    rb.set(n2p.choke_state,      { width:"1*", minWidth: 60 });
+    rb.set(n2p.local_choke,      { width:"1*", minWidth: 40 });
 
     tcm.setDataCellRenderer(n2p.local_choke, 
       new qx.ui.table.cellrenderer.Boolean());

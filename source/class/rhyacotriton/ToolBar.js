@@ -67,6 +67,11 @@ qx.Class.define("rhyacotriton.ToolBar",
     this.__stopBtn.setCommand(controller.getCommand("stopSelectedRows"));
     this.add(this.__stopBtn);
 
+    this.__wishBtn = new qx.ui.toolbar.Button(this.tr("Wish"), 
+      "");
+    this.__wishBtn.setCommand(controller.getCommand("wishSelectedFiles"));
+    this.add(this.__wishBtn);
+
     this.addSpacer();
 
     this.__peersView = new qx.ui.toolbar.RadioButton(this.tr("Peers"), 

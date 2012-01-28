@@ -42,8 +42,9 @@ qx.Class.define("rhyacotriton.Container",
 
     this.__peersTable = new rhyacotriton.peers.Table(this.__store, this.__table);
     this.__logTable = new rhyacotriton.log.Table(this.__store, this.__table);
+    this.__filesTree = new rhyacotriton.files.Tree(this.__store, this.__table);
 
-    this.__filesView = new qx.ui.embed.Html("");
+    this.__filesView = this.__filesTree;
     this.__peersView = this.__peersTable;
     this.__logView = this.__logTable;
 
@@ -202,9 +203,17 @@ qx.Class.define("rhyacotriton.Container",
       commands.stopSelectedRows = new qx.ui.core.Command("Control+P");
       commands.stopSelectedRows.addListener("execute", this.stopSelectedRows, this);
 
+      commands.wishSelectedFiles = new qx.ui.core.Command("Control+W");
+      commands.wishSelectedFiles.addListener("execute", this.wishSelectedFiles, this);
+
       this.__commands = commands;
     },
 
+
+    wishSelectedFiles : function()
+    {
+        this.__filesTree.wishSelectedIds();
+    },
 
     /**
      * TODOC
@@ -221,6 +230,7 @@ qx.Class.define("rhyacotriton.Container",
       {
         case "files":
           this.__stack.setSelection([ this.__filesView ]);
+          this.__filesTree.setActive(true);
           this.__stack.show();
           break;
 
@@ -236,6 +246,7 @@ qx.Class.define("rhyacotriton.Container",
           break;
 
         default:
+          this.__filesTree.setActive(false);
           this.__stack.resetSelection();
           this.__stack.exclude();
       }

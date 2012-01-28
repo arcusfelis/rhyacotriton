@@ -19,7 +19,7 @@ qx.Class.define("rhyacotriton.cellrenderer.Progress",
      * @return {var} TODOC
      */
     _getContentHtml : function(cellInfo) {
-      return cellInfo.rowData[cellInfo.col] + "%";
+      return  (cellInfo.rowData[cellInfo.col] * 100).toFixed(2) + "%";
     },
 
     // overridden
