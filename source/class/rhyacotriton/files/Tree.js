@@ -84,7 +84,7 @@ qx.Class.define("rhyacotriton.files.Tree",
         // get server id
         var sid = node.id;
         // add a node to the tree
-        if (typeof(this.__nid2sid[nid]) == 'undefined') {
+        if (typeof(this.__sid2nid[sid]) == 'undefined') {
           if (node.is_leaf) {
             var nid = dm.addLeaf(parent, node.name);
           } else {
