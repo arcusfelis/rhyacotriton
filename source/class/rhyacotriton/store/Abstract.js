@@ -197,8 +197,7 @@ qx.Class.define("rhyacotriton.store.Abstract",
     /*
      * <ul>
      *   <li>torrent_id</li>
-     *   <li>parent</li>
-     *   <li>nodes</li>
+     *   <li>nodes : [{parent_id, childrens}]</li>
      * </ul>
      */
     "fileDataLoadCompleted" : "qx.event.type.Data",
