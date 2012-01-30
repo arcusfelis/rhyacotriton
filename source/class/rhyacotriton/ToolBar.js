@@ -5,11 +5,11 @@
 #asset(qx/icon/Tango/22/actions/view-refresh.png)
 #asset(qx/icon/Tango/22/actions/media-playback-start.png)
 #asset(qx/icon/Tango/22/actions/media-playback-pause.png)
+#asset(qx/icon/Tango/22/actions/dialog-apply.png)
 #asset(qx/icon/Tango/22/devices/network-wired.png)
 #asset(qx/icon/Tango/22/apps/utilities-log-viewer.png)
 #asset(qx/icon/Tango/22/apps/preferences-users.png)
 #asset(qx/icon/Tango/22/places/folder-open.png)
-
 
 ************************************************************************ */
 
@@ -50,12 +50,12 @@ qx.Class.define("rhyacotriton.ToolBar",
     this.__addBtn = new qx.ui.toolbar.Button(this.tr("Add"), 
       "icon/22/actions/list-add.png");
     this.__addBtn.setCommand(controller.getCommand("addTorrent"));
-    this.add(this.__addBtn);
+//  this.add(this.__addBtn);
 
     this.__removeBtn = new qx.ui.toolbar.Button(this.tr("Remove"), 
       "icon/22/actions/list-remove.png");
     this.__removeBtn.setCommand(controller.getCommand("removeSelectedRows"));
-    this.add(this.__removeBtn);
+//  this.add(this.__removeBtn);
 
     this.__startBtn = new qx.ui.toolbar.Button(this.tr("Start"), 
       "icon/22/actions/media-playback-start.png");
@@ -67,8 +67,8 @@ qx.Class.define("rhyacotriton.ToolBar",
     this.__stopBtn.setCommand(controller.getCommand("stopSelectedRows"));
     this.add(this.__stopBtn);
 
-    this.__wishBtn = new qx.ui.toolbar.Button(this.tr("Wish"), 
-      "");
+    this.__wishBtn = new qx.ui.toolbar.Button(this.tr("Wish files"), 
+      "icon/22/actions/dialog-apply.png");
     this.__wishBtn.setCommand(controller.getCommand("wishSelectedFiles"));
     this.add(this.__wishBtn);
 
@@ -98,11 +98,14 @@ qx.Class.define("rhyacotriton.ToolBar",
       controller);
 
     this.enableRowButtons(false);
+    this.enableFileRowButtons(false);
+    this.showFileViewButtons(false);
   },
 
   members :
   {
-    __isRowButtonsEnabled : true,
+    __isRowButtonsEnabled : false,
+    __isFileRowButtonsEnabled : false,
 
 
     /**
@@ -121,6 +124,15 @@ qx.Class.define("rhyacotriton.ToolBar",
     },
 
 
+    __enableFileRowButtons : function(flag)
+    {
+      [ this.__wishBtn
+      ].map(function(x) {
+        x.setEnabled(flag);
+      });
+    },
+
+
     /**
      * TODOC
      *
@@ -130,6 +142,20 @@ qx.Class.define("rhyacotriton.ToolBar",
     {
       this.__isRowButtonsEnabled = flag;
       this.__enableRowButtons(flag);
+    },
+
+
+    enableFileRowButtons : function(flag)
+    {
+      this.__isFileRowButtonsEnabled = flag;
+      this.__enableFileRowButtons(flag);
+    },
+
+
+    showFileViewButtons : function(flag)
+    {
+      if (flag) this.__wishBtn.show();
+      else      this.__wishBtn.hide();
     },
 
 
@@ -146,6 +172,9 @@ qx.Class.define("rhyacotriton.ToolBar",
 
       if (flag == this.__isRowButtonsEnabled) 
         this.__enableRowButtons(flag);
+
+      if (flag == this.__isFileRowButtonsEnabled) 
+        this.__enableFileRowButtons(flag);
     }
   }
 });

@@ -62,6 +62,7 @@ qx.Class.define("rhyacotriton.Container",
     this.__infosplit.add(this.__stack, 1);
 
     this._initToolbarButtonActivation();
+    this._initToolbarFileButtonActivation();
 
     this.setEnabled(false);
   },
@@ -109,6 +110,21 @@ qx.Class.define("rhyacotriton.Container",
       {
         var isEnabled = !(e.getCurrentTarget().isSelectionEmpty());
         this.enableRowButtons(isEnabled);
+      },
+      this.__toolBar);
+    },
+
+
+    _initToolbarFileButtonActivation : function()
+    {
+      var selModel = this.__filesTree.getSelectionModel();
+
+      // Register action for enabling the buttons when
+      // a row is selected.
+      selModel.addListener("changeSelection", function(e)
+      {
+        var isEnabled = !(e.getCurrentTarget().isSelectionEmpty());
+        this.enableFileRowButtons(isEnabled);
       },
       this.__toolBar);
     },
@@ -225,6 +241,7 @@ qx.Class.define("rhyacotriton.Container",
       var selected = e.getData()[0];
       var show = selected != null ? selected.getUserData("value") : "";
       this.info("Show view: " + show);
+      var isFileViewEnabled = false;
 
       switch(show)
       {
@@ -232,6 +249,7 @@ qx.Class.define("rhyacotriton.Container",
           this.__stack.setSelection([ this.__filesView ]);
           this.__filesTree.setActive(true);
           this.__stack.show();
+          isFileViewEnabled = true;
           break;
 
         case "peers":
@@ -250,6 +268,8 @@ qx.Class.define("rhyacotriton.Container",
           this.__stack.resetSelection();
           this.__stack.exclude();
       }
+
+      this.__toolBar.showFileViewButtons(isFileViewEnabled);
     },
 
 

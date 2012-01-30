@@ -57,6 +57,7 @@ qx.Class.define("rhyacotriton.Table",
     rb.set(n2p.all_time_uploaded,   { width:"1*", minWidth: 70 });
     rb.set(n2p.sum_downloaded,      { width:"1*", minWidth: 70 });
     rb.set(n2p.sum_uploaded,        { width:"1*", minWidth: 70 });
+    rb.set(n2p.online,    { width:"1*", minWidth: 30 });
 
     tcm.setDataCellRenderer(n2p.progress, 
       new rhyacotriton.cellrenderer.Progress());
@@ -100,6 +101,7 @@ qx.Class.define("rhyacotriton.Table",
       this.getEventHandler("dataLoadCompleted"), this);
     s.addListener("dataUpdated", 
       this.getEventHandler("dataUpdated"), this);
+    s.addListener("logEvent", this.logHandler, this);
   },
 
   members :
@@ -228,6 +230,27 @@ qx.Class.define("rhyacotriton.Table",
       newValues[n2p.progress] = this.__calcProgress(newValues);
 
       return newValues;
+    },
+
+    /**
+     * Handles updates from the store.
+     */
+    logHandler: function(e)
+    {
+      var data = e.getData();
+      var name = data.name;
+      if (name == "started_torrent") {
+        this.setTorrentOnline(data.torrent_id, true);
+      } 
+      else 
+      if (name == "stopped_torrent") {
+        this.setTorrentOnline(data.torrent_id, false);
+      }
+    },
+
+    setTorrentOnline: function(torrentId, isOnline) 
+    {
+      this.particallyUpdateRows([{"id" : torrentId, "online" : isOnline}]);
     }
   }
 });

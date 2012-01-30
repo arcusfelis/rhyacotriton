@@ -23,7 +23,7 @@ qx.Class.define("rhyacotriton.files.Tree",
         i++;
     }
     delete i;
-    this.base(arguments, captions);
+    this.base(arguments, captions, {dataModel: new smart.model.TreeTable()});
     
     this.__n2p = n2p;
     this.__ids = ids;
@@ -34,9 +34,9 @@ qx.Class.define("rhyacotriton.files.Tree",
 
     // Ensure that the tree column remains sufficiently wide
     rb.set(n2p.name,     { width:"1*", minWidth:180 });
-    rb.set(n2p.size,     { width:"1*", minWidth:70  });
-    rb.set(n2p.id,       { width:"1*", minWidth:30  });
-    rb.set(n2p.progress, { width:"1*", minWidth:65  });
+    rb.set(n2p.size,     { width:"1*", minWidth:70, maxWidth:90  });
+    rb.set(n2p.id,       { width:"1*", minWidth:30, maxWidth:40  });
+    rb.set(n2p.progress, { width:"1*", minWidth:65, maxWidth:80  });
 
 
     tcm.setDataCellRenderer(n2p.size, new rhyacotriton.cellrenderer.Size());
@@ -107,7 +107,9 @@ qx.Class.define("rhyacotriton.files.Tree",
 
     __clearState : function() {
       var tm = this.getDataModel();
+      var sm = this.getSelectionModel();
       tm.clearData();
+      sm.resetSelection();
       this.__nid2sid = {};
       this.__sid2nid = {};
     },

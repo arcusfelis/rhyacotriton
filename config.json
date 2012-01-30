@@ -60,7 +60,7 @@
       "library" :
       [
         {
-          "manifest" : "contrib://SmartTableModel/trunk/Manifest.json"
+          "manifest" : "smartTableModel/Manifest.json"
         }
       ]
     }

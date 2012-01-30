@@ -27,9 +27,9 @@ qx.Class.define("rhyacotriton.log.Table",
 
     var rb = tcm.getBehavior();
 
-    rb.set(n2p.torrent_id, { width:"1*", minWidth: 30 });
-    rb.set(n2p.time,       { width:"1*", minWidth: 55 });
-    rb.set(n2p.name,       { width:"1*", minWidth: 90 });
+    rb.set(n2p.torrent_id, { width:"1*", minWidth: 30, maxWidth: 40 });
+    rb.set(n2p.time,       { width:"1*", minWidth: 55, maxWidth: 70 });
+    rb.set(n2p.name,       { width:"1*", minWidth: 90, maxWidth: 120 });
     rb.set(n2p.message,    { width:"1*", minWidth: 130 });
 
     var tm = this.getTableModel();
