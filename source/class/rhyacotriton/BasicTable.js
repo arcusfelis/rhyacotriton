@@ -228,6 +228,8 @@ qx.Class.define("rhyacotriton.BasicTable",
       this.__tableModel.addRows(rows, /* copy */ true, /* fireEvent */ false);
 
       this.updateContent();
+      this.getPaneScroller(0).updateVerScrollBarMaximum();
+      this._updateScrollBarVisibility();
     },
 
 

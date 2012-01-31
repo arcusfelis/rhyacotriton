@@ -34,8 +34,6 @@ qx.Class.define("rhyacotriton.store.Remote",
 
     // url of the bullet handler
     this.__url = basedir + "stream";
-
-    this.__openConnection();
   },
 
   members :
@@ -43,6 +41,12 @@ qx.Class.define("rhyacotriton.store.Remote",
     __bullet : null,
     __url : null,
 
+    
+    finalize : function()
+    {
+      this.__openConnection();
+    },
+    
 
     /**
      * TODOC

@@ -41,21 +41,6 @@ qx.Class.define("rhyacotriton.Container",
 
     this.__table = new rhyacotriton.Table(this.__store);
 
-    this.__peersTable = new rhyacotriton.peers.Table(this.__store, this.__table);
-    this.__logTable = new rhyacotriton.log.Table(this.__store, this.__table);
-    this.__filesTree = new rhyacotriton.files.Tree(this.__store, this.__table);
-    this.__wishesList = new rhyacotriton.wishlist.List(this, this.__store, this.__table);
-
-    this.__filesView = this.__filesTree;
-    this.__wishesView = this.__wishesList;
-    this.__peersView = this.__peersTable;
-    this.__logView = this.__logTable;
-
-    this.__stack.add(this.__filesView);
-    this.__stack.add(this.__wishesView);
-    this.__stack.add(this.__peersView);
-    this.__stack.add(this.__logView);
-
     this.add(this.__table);
 
     this.__infosplit = new qx.ui.splitpane.Pane("horizontal");
@@ -66,7 +51,7 @@ qx.Class.define("rhyacotriton.Container",
     this.__infosplit.add(this.__stack, 1);
 
     this._initToolbarButtonActivation();
-    this._initToolbarFileButtonActivation();
+//  this._initToolbarFileButtonActivation();
 
     this.setEnabled(false);
   },
@@ -80,10 +65,44 @@ qx.Class.define("rhyacotriton.Container",
     __table : null,
     __commands : null,
     __application : null,
+    __viewLoaded : false,
+    __activeView : "",
 
     getRoot : function()
     {
       return this.__application.getRoot();
+    },
+
+    finalize : function()
+    {
+      var container = this;
+      setTimeout(function() { container.__store.finalize(); }, 1000);
+
+      // Do heavy calculations in idle time
+      setTimeout(function() { container._initViews(); }, 3000);
+    },
+
+    _initViews : function()
+    {
+
+      this.__peersTable = new rhyacotriton.peers.Table(this.__store, this.__table);
+      this.__logTable = new rhyacotriton.log.Table(this.__store, this.__table);
+      this.__filesTree = new rhyacotriton.files.Tree(this.__store, this.__table);
+      this.__wishesList = new rhyacotriton.wishlist.List(this, this.__store, 
+                this.__table);
+ 
+      this.__filesView = this.__filesTree;
+      this.__wishesView = this.__wishesList;
+      this.__peersView = this.__peersTable;
+      this.__logView = this.__logTable;
+ 
+      this.__stack.add(this.__filesView);
+      this.__stack.add(this.__wishesView);
+      this.__stack.add(this.__peersView);
+      this.__stack.add(this.__logView);
+
+      this.__viewLoaded = true;
+      this.selectView(this.__activeView);
     },
 
 
@@ -249,8 +268,18 @@ qx.Class.define("rhyacotriton.Container",
     syncStackView : function(e)
     {
       var selected = e.getData()[0];
-      var show = selected != null ? selected.getUserData("value") : "";
-      this.info("Show view: " + show);
+      var view = selected != null ? selected.getUserData("value") : "";
+
+      this.__activeView = view;
+
+      // Are views initialized?
+      if (this.__viewLoaded)
+        this.selectView(view);
+    },
+
+    
+    selectView : function(show)
+    {
       var isFileViewEnabled = false;
       var isWishViewEnabled = false;
 
