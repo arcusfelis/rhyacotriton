@@ -6,6 +6,7 @@
 #asset(qx/icon/Tango/22/actions/media-playback-start.png)
 #asset(qx/icon/Tango/22/actions/media-playback-pause.png)
 #asset(qx/icon/Tango/22/actions/dialog-apply.png)
+#asset(qx/icon/Tango/22/actions/view-sort-descending.png)
 #asset(qx/icon/Tango/22/devices/network-wired.png)
 #asset(qx/icon/Tango/22/apps/utilities-log-viewer.png)
 #asset(qx/icon/Tango/22/apps/preferences-users.png)
@@ -84,6 +85,11 @@ qx.Class.define("rhyacotriton.ToolBar",
     this.__filesView.setUserData("value", "files");
     this.add(this.__filesView);
 
+    this.__wishesView = new qx.ui.toolbar.RadioButton(this.tr("Wishes"), 
+      "icon/22/actions/view-sort-descending.png");
+    this.__wishesView.setUserData("value", "wishlist");
+    this.add(this.__wishesView);
+
     this.__logView = new qx.ui.toolbar.RadioButton(this.tr("Log"), 
       "icon/22/apps/utilities-log-viewer.png");
     this.__logView.setUserData("value", "log");
@@ -93,6 +99,7 @@ qx.Class.define("rhyacotriton.ToolBar",
     this.__viewGroup.setAllowEmptySelection(true);
     this.__viewGroup.add(this.__logView);
     this.__viewGroup.add(this.__filesView);
+    this.__viewGroup.add(this.__wishesView);
     this.__viewGroup.add(this.__peersView);
     this.__viewGroup.addListener("changeSelection", controller.syncStackView, 
       controller);

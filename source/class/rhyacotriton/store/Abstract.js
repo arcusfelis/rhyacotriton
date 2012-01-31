@@ -88,6 +88,8 @@ qx.Class.define("rhyacotriton.store.Abstract",
 
 
     getFileTreeNode : function(tid, nid) {},
+    getWishes : function(tid) {},
+    setWishes : function(tid, list) {},
     wishSelectedFiles : function(tid, nids) {},
 
     /**
@@ -211,6 +213,17 @@ qx.Class.define("rhyacotriton.store.Abstract",
      *   <li>rows</li>
      * </ul>
      */
-    "dataAdded"             : "qx.event.type.Data"
+    "dataAdded"             : "qx.event.type.Data",
+
+    /**
+     * Load a full set of data from server.
+     *
+     * The data is a map containing this properties:
+     * <ul>
+     *   <li>torrent_id</li>
+     *   <li>list : {name :: string(), value :: [int()] | int()}</li>
+     * </ul>
+     */
+    "wishDataLoadCompleted" : "qx.event.type.Data"
   }
 });

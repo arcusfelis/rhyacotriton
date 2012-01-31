@@ -55,8 +55,6 @@ qx.Class.define("rhyacotriton.Application",
 //    }
 
 
-
-
       /*
       -------------------------------------------------------------------------
         Below is your actual application code...
@@ -64,7 +62,7 @@ qx.Class.define("rhyacotriton.Application",
       */
 
       // Initialize the compositor
-      this.__container = new rhyacotriton.Container;
+      this.__container = new rhyacotriton.Container(this);
       this.getRoot().add(this.__container, { edge : 0 });
     }
   }

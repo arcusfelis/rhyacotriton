@@ -77,6 +77,16 @@ qx.Class.define("rhyacotriton.BasicTable",
     __columnNames : null,
     __columnCaptions : null,
 
+    _onKeyPress : function(e)
+    {
+      var code = e.getKeyIdentifier();
+      if (code == "Escape") {
+        this.__selectionModel.resetSelection();
+      } else {
+        this.base(arguments, e);
+      }
+    },
+
 
     /**
      * INITIALIZATION PART

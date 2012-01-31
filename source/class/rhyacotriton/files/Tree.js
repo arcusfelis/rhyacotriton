@@ -24,7 +24,9 @@ qx.Class.define("rhyacotriton.files.Tree",
         i++;
     }
     delete i;
-    this.base(arguments, captions, {dataModel: new rhyacotriton.files.Model(this)});
+    
+    var custom = {dataModel: new rhyacotriton.files.Model(this)};
+    this.base(arguments, captions, custom);
     
     this.__n2p = n2p;
     this.__ids = ids;
@@ -40,6 +42,12 @@ qx.Class.define("rhyacotriton.files.Tree",
     rb.set(n2p.id,       { width:"1*", minWidth:30, maxWidth:40  });
     rb.set(n2p.progress, { width:"1*", minWidth:65, maxWidth:80  });
 
+    [ n2p.capacity
+    , n2p.id 
+    ].map(function(id)
+    {
+      tcm.setColumnVisible(id, false);
+    });
 
     tcm.setDataCellRenderer(n2p.size, new rhyacotriton.cellrenderer.Size());
     tcm.setDataCellRenderer(n2p.progress, 
@@ -65,7 +73,7 @@ qx.Class.define("rhyacotriton.files.Tree",
       this.onDataLoad, this);
     
     var msm = main.getSelectionModel();
-    msm.addListener("changeSelection", this.updateFilters, this);
+    msm.addListener("changeSelection", this.refresh, this);
     
     this.setAlwaysShowOpenCloseSymbol(true);
   },
@@ -81,6 +89,18 @@ qx.Class.define("rhyacotriton.files.Tree",
     __oldSelection : [],
     __openSids : [],
     __dirSids : [],
+    __active : false,
+
+    _onKeyPress : function(e)
+    {
+      var code = e.getKeyIdentifier();
+      if (code == "Escape") {
+        var sm = this.getSelectionModel();
+        sm.resetSelection();
+      } else {
+        this.base(arguments, e);
+      }
+    },
     
 
     addRows : function(tid, /*sid*/ parent_sid, rows)
@@ -136,6 +156,8 @@ qx.Class.define("rhyacotriton.files.Tree",
     setActive : function(bActive) {
       // is visable
       this.__active = bActive;
+      if (bActive) 
+        this.refresh();
     },
 
 
@@ -235,8 +257,10 @@ qx.Class.define("rhyacotriton.files.Tree",
     /**
      * Fired, when selection in the main table was modified.
      */
-    updateFilters : function(e)
+    refresh : function()
     {
+      if (!this.__active) return;
+
       var dm = this.getDataModel();
 
       var newSel = this.__mainTable.getSelectedIds();

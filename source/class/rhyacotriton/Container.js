@@ -15,11 +15,12 @@ qx.Class.define("rhyacotriton.Container",
   *****************************************************************************
   */
 
-  construct : function()
+  construct : function(app)
   {
     // Create main layout
     this.__mainLayout = new qx.ui.layout.Dock();
     this.base(arguments, this.__mainLayout);
+    this.__application = app;
     this._initializeCommands();
     this._initStore();
 
@@ -43,12 +44,15 @@ qx.Class.define("rhyacotriton.Container",
     this.__peersTable = new rhyacotriton.peers.Table(this.__store, this.__table);
     this.__logTable = new rhyacotriton.log.Table(this.__store, this.__table);
     this.__filesTree = new rhyacotriton.files.Tree(this.__store, this.__table);
+    this.__wishesList = new rhyacotriton.wishlist.List(this, this.__store, this.__table);
 
     this.__filesView = this.__filesTree;
+    this.__wishesView = this.__wishesList;
     this.__peersView = this.__peersTable;
     this.__logView = this.__logTable;
 
     this.__stack.add(this.__filesView);
+    this.__stack.add(this.__wishesView);
     this.__stack.add(this.__peersView);
     this.__stack.add(this.__logView);
 
@@ -75,6 +79,12 @@ qx.Class.define("rhyacotriton.Container",
     __store : null,
     __table : null,
     __commands : null,
+    __application : null,
+
+    getRoot : function()
+    {
+      return this.__application.getRoot();
+    },
 
 
     /**
@@ -242,14 +252,20 @@ qx.Class.define("rhyacotriton.Container",
       var show = selected != null ? selected.getUserData("value") : "";
       this.info("Show view: " + show);
       var isFileViewEnabled = false;
+      var isWishViewEnabled = false;
 
       switch(show)
       {
         case "files":
           this.__stack.setSelection([ this.__filesView ]);
-          this.__filesTree.setActive(true);
           this.__stack.show();
           isFileViewEnabled = true;
+          break;
+
+        case "wishlist":
+          this.__stack.setSelection([ this.__wishesView ]);
+          this.__stack.show();
+          isWishViewEnabled = true;
           break;
 
         case "peers":
@@ -264,11 +280,12 @@ qx.Class.define("rhyacotriton.Container",
           break;
 
         default:
-          this.__filesTree.setActive(false);
           this.__stack.resetSelection();
           this.__stack.exclude();
       }
 
+      this.__filesTree.setActive(isFileViewEnabled);
+      this.__wishesList.setActive(isWishViewEnabled);
       this.__toolBar.showFileViewButtons(isFileViewEnabled);
     },
 
