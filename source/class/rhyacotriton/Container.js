@@ -84,12 +84,12 @@ qx.Class.define("rhyacotriton.Container",
 
     _initViews : function()
     {
-
       this.__peersTable = new rhyacotriton.peers.Table(this.__store, this.__table);
       this.__logTable = new rhyacotriton.log.Table(this.__store, this.__table);
       this.__filesTree = new rhyacotriton.files.Tree(this.__store, this.__table);
       this.__wishesList = new rhyacotriton.wishlist.List(this, this.__store, 
                 this.__table);
+      this._initToolbarFileButtonActivation();
  
       this.__filesView = this.__filesTree;
       this.__wishesView = this.__wishesList;
