@@ -73,6 +73,11 @@ qx.Class.define("rhyacotriton.ToolBar",
     this.__wishBtn.setCommand(controller.getCommand("wishSelectedFiles"));
     this.add(this.__wishBtn);
 
+    this.__infoBtn = new qx.ui.toolbar.Button(this.tr("File info"), 
+      "icon/22/actions/dialog-apply.png");
+    this.__infoBtn.setCommand(controller.getCommand("loadFileInfo"));
+    this.add(this.__infoBtn);
+
     this.addSpacer();
 
     this.__peersView = new qx.ui.toolbar.RadioButton(this.tr("Peers"), 
@@ -161,8 +166,14 @@ qx.Class.define("rhyacotriton.ToolBar",
 
     showFileViewButtons : function(flag)
     {
-      if (flag) this.__wishBtn.show();
-      else      this.__wishBtn.hide();
+      if (flag) {
+        this.__wishBtn.show();
+        this.__infoBtn.show();
+      }
+      else {
+        this.__wishBtn.hide();
+        this.__infoBtn.hide();
+      }
     },
 
 

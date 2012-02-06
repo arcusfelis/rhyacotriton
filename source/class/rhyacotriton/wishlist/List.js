@@ -89,8 +89,8 @@ qx.Class.define("rhyacotriton.wishlist.List",
         var name = wish.name;
         var item = new qx.ui.form.ListItem(name, icon);
 
-        // Add tag with the value
-        item.rawData = wish.value;
+        // Add tag with the proplist
+        item.rawData = wish;
 
         // Save the current value
         newList[i] = wish.value;

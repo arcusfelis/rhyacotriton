@@ -103,6 +103,8 @@ qx.Class.define("rhyacotriton.Container",
 
       this.__viewLoaded = true;
       this.selectView(this.__activeView);
+
+      this.__initTracksWindow(); 
     },
 
 
@@ -251,13 +253,21 @@ qx.Class.define("rhyacotriton.Container",
       commands.wishSelectedFiles = new qx.ui.core.Command("Control+W");
       commands.wishSelectedFiles.addListener("execute", this.wishSelectedFiles, this);
 
+      commands.wishSelectedFiles = new qx.ui.core.Command("Control+Shift+I");
+      commands.wishSelectedFiles.addListener("execute", this.loadFileInfo, this);
+
       this.__commands = commands;
     },
 
 
     wishSelectedFiles : function()
     {
-        this.__filesTree.wishSelectedIds();
+      this.__filesTree.wishSelectedIds();
+    },
+
+    loadFileInfo : function()
+    {
+      this.__filesTree.loadFileInfo();
     },
 
     /**
@@ -328,6 +338,25 @@ qx.Class.define("rhyacotriton.Container",
     {
       this.__toolBar.setEnabled(flag);
       this.__table.setEnabled(flag);
+    },
+
+    __initTracksWindow : function()
+    {
+      var win = new qx.ui.window.Window(
+        this.tr("Tracks"),
+        "icon/16/categories/internet.png").set({
+        width : 300,
+        height: 300,
+        contentPadding: 0,
+        showMinimize: false
+      });
+
+      win.setLayout(new qx.ui.layout.Canvas());
+      this.__tracksTable = new rhyacotriton.tracks.Table(this.__store, this.__table);
+      win.add(this.__tracksTable, {edge: 0});
+      win.moveTo(10, 10);
+
+      win.open();
     }
   }
 });

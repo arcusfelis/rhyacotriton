@@ -150,6 +150,7 @@ qx.Class.define("rhyacotriton.files.Tree",
       sm.resetSelection();
       this.__nid2sid = {};
       this.__sid2nid = {};
+      this.__dirSids = [];
     },
 
 
@@ -292,6 +293,14 @@ qx.Class.define("rhyacotriton.files.Tree",
       // Files' identificators on the server
       var sids = this.getSelectedIds();
       this.__store.wishSelectedFiles(this.__tid, sids);
+    },
+
+    
+    loadFileInfo : function()
+    {
+      var sids = this.getSelectedIds();
+      if (sids.length) 
+        this.__store.loadFileInfo(this.__tid, sids[0]);
     },
 
     sortHandler : function()

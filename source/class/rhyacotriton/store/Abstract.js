@@ -91,6 +91,7 @@ qx.Class.define("rhyacotriton.store.Abstract",
     getWishes : function(tid) {},
     setWishes : function(tid, list) {},
     wishSelectedFiles : function(tid, nids) {},
+    loadFileInfo : function(tid, fid) {},
 
     /**
      * This functions allows to sort pids in the table.
@@ -224,6 +225,8 @@ qx.Class.define("rhyacotriton.store.Abstract",
      *   <li>list : {name :: string(), value :: [int()] | int()}</li>
      * </ul>
      */
-    "wishDataLoadCompleted" : "qx.event.type.Data"
+    "wishDataLoadCompleted" : "qx.event.type.Data",
+
+    "tracksDataLoadCompleted" : "qx.event.type.Data"
   }
 });
