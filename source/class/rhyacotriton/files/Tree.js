@@ -296,13 +296,6 @@ qx.Class.define("rhyacotriton.files.Tree",
     },
 
     
-    loadFileInfo : function()
-    {
-      var sids = this.getSelectedIds();
-      if (sids.length) 
-        this.__store.loadFileInfo(this.__tid, sids[0]);
-    },
-
     sortHandler : function()
     {
       var dm = this.getDataModel();  
@@ -324,6 +317,11 @@ qx.Class.define("rhyacotriton.files.Tree",
     {
       this.__tid = tid;
       this.updateData();
+    },
+
+    getTorrentId : function()
+    {
+      return this.__tid;
     }
   }
 });

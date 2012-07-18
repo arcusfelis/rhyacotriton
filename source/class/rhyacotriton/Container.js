@@ -34,26 +34,29 @@ qx.Class.define("rhyacotriton.Container",
 
     // Create side panel
     this.__stack = new qx.ui.container.Stack;
-    this.__stack.setDecorator("main");
     this.__stack.resetSelection();
-    this.__stack.setWidth(200);
     this.__stack.exclude();
 
+    this.__mainStack = new qx.ui.container.Stack;
     this.__table = new rhyacotriton.Table(this.__store);
+    this.__mainStack.add(this.__table);
 
-    this.add(this.__table);
 
     this.__infosplit = new qx.ui.splitpane.Pane("horizontal");
     this.__infosplit.setDecorator(null);
     this.add(this.__infosplit);
 
-    this.__infosplit.add(this.__table, 2);
+    this.__infosplit.add(this.__mainStack, 2);
     this.__infosplit.add(this.__stack, 1);
 
     this._initToolbarButtonActivation();
 //  this._initToolbarFileButtonActivation();
 
     this.setEnabled(false);
+
+    // Set "dead" zones (never will get focus)
+    this.__header.setKeepFocus(true);
+    this.__toolBar.setKeepFocus(true);
   },
 
   members :
@@ -101,12 +104,50 @@ qx.Class.define("rhyacotriton.Container",
       this.__stack.add(this.__peersView);
       this.__stack.add(this.__logView);
 
+      this.__regFocusHandlers([ this.__table
+                              , this.__filesTree 
+                              , this.__peersTable 
+                              , this.__logTable   
+                              , this.__wishesList
+                              ]);
+
       this.__viewLoaded = true;
       this.selectView(this.__activeView);
-
-      this.__initTracksWindow(); 
     },
 
+    __regFocusHandlers : function(arr)
+    {
+      var container = this;
+
+      arr.map(function(obj) {
+        obj.addListener("focusin",  container.__focusInHandler,  container);
+        obj.addListener("focusout", container.__focusOutHandler, container);
+      });
+    },  
+
+    __focusInHandler : function(e)
+    {
+      var t = e.getTarget();
+      var n = this.getName(t);
+      this.__toolBar.activate(n);
+    },
+
+    __focusOutHandler : function(e)
+    {
+      var t = e.getTarget();
+      var n = this.getName(t);
+      this.__toolBar.deactivate(n);
+    },
+
+    getName: function(t)
+    {
+      return (t == this.__table)       ? "torrent_table" : 
+             (t == this.__filesTree)   ? "file_tree"     : 
+             (t == this.__peersTable)  ? "peer_table"    : 
+             (t == this.__logTable)    ? "log_table"     : 
+             (t == this.__wishesList)  ? "wish_list"     : 
+             "unknown";
+    },
 
     /**
      * TODOC
@@ -233,41 +274,53 @@ qx.Class.define("rhyacotriton.Container",
       var commands = {};
 
       commands.reconnect = new qx.ui.core.Command("Control+Shift+R");
+      commands.reconnect.setToolTipText("Control+Shift+R");
       commands.reconnect.addListener("execute", this.reconnect, this);
 
       commands.reload = new qx.ui.core.Command("Control+R");
+      commands.reload.setToolTipText("Control+R");
       commands.reload.addListener("execute", this.reload, this);
 
       commands.addTorrent = new qx.ui.core.Command("Control+A");
+      commands.addTorrent.setToolTipText("Control+A");
       commands.addTorrent.addListener("execute", this.showAddTorrent, this);
 
       commands.removeSelectedRows = new qx.ui.core.Command("Control+D");
+      commands.removeSelectedRows.setToolTipText("Control+D");
       commands.removeSelectedRows.addListener("execute", this.removeSelectedRows, this);
 
       commands.startSelectedRows = new qx.ui.core.Command("Control+S");
+      commands.startSelectedRows.setToolTipText("Control+S");
       commands.startSelectedRows.addListener("execute", this.startSelectedRows, this);
 
       commands.stopSelectedRows = new qx.ui.core.Command("Control+P");
+      commands.stopSelectedRows.setToolTipText("Control+P");
       commands.stopSelectedRows.addListener("execute", this.stopSelectedRows, this);
 
       commands.wishSelectedFiles = new qx.ui.core.Command("Control+W");
+      commands.wishSelectedFiles.setToolTipText("Control+W");
       commands.wishSelectedFiles.addListener("execute", this.wishSelectedFiles, this);
 
-      commands.wishSelectedFiles = new qx.ui.core.Command("Control+Shift+I");
-      commands.wishSelectedFiles.addListener("execute", this.loadFileInfo, this);
+
+      // Special commands
+      commands.showWishView = new qx.ui.core.Command("Control+Shift+W");
+      commands.showWishView.setToolTipText("Control+Shift+W");
+
+      commands.showLogView = new qx.ui.core.Command("Control+Shift+L");
+      commands.showLogView.setToolTipText("Control+Shift+L");
+
+      commands.showFileView = new qx.ui.core.Command("Control+Shift+F");
+      commands.showFileView.setToolTipText("Control+Shift+F");
+
+      commands.showPeerView = new qx.ui.core.Command("Control+Shift+P");
+      commands.showPeerView.setToolTipText("Control+Shift+P");
 
       this.__commands = commands;
     },
 
-
     wishSelectedFiles : function()
     {
       this.__filesTree.wishSelectedIds();
-    },
-
-    loadFileInfo : function()
-    {
-      this.__filesTree.loadFileInfo();
     },
 
     /**
@@ -298,12 +351,14 @@ qx.Class.define("rhyacotriton.Container",
         case "files":
           this.__stack.setSelection([ this.__filesView ]);
           this.__stack.show();
+          this.__filesView.focus();
           isFileViewEnabled = true;
           break;
 
         case "wishlist":
           this.__stack.setSelection([ this.__wishesView ]);
           this.__stack.show();
+          this.__wishesView.focus();
           isWishViewEnabled = true;
           break;
 
@@ -311,21 +366,23 @@ qx.Class.define("rhyacotriton.Container",
           this.__store.reloadPeers();
           this.__stack.setSelection([ this.__peersView ]);
           this.__stack.show();
+          this.__peersView.focus();
           break;
 
         case "log":
           this.__stack.setSelection([ this.__logView ]);
           this.__stack.show();
+          this.__logView.focus();
           break;
 
         default:
           this.__stack.resetSelection();
           this.__stack.exclude();
+          this.__table.focus();
       }
 
       this.__filesTree.setActive(isFileViewEnabled);
       this.__wishesList.setActive(isWishViewEnabled);
-      this.__toolBar.showFileViewButtons(isFileViewEnabled);
     },
 
 
@@ -338,25 +395,6 @@ qx.Class.define("rhyacotriton.Container",
     {
       this.__toolBar.setEnabled(flag);
       this.__table.setEnabled(flag);
-    },
-
-    __initTracksWindow : function()
-    {
-      var win = new qx.ui.window.Window(
-        this.tr("Tracks"),
-        "icon/16/categories/internet.png").set({
-        width : 300,
-        height: 300,
-        contentPadding: 0,
-        showMinimize: false
-      });
-
-      win.setLayout(new qx.ui.layout.Canvas());
-      this.__tracksTable = new rhyacotriton.tracks.Table(this.__store, this.__table);
-      win.add(this.__tracksTable, {edge: 0});
-      win.moveTo(10, 10);
-
-      win.open();
     }
   }
 });

@@ -186,6 +186,7 @@ qx.Class.define("rhyacotriton.BasicTable",
         var pos = tm.locate(n2p.id, row.id);
         tm.setRow(pos, newValues);
       }
+      this.fireEvent("tableRefreshed");
     },
 
     /* The event is from the user. */
@@ -230,6 +231,7 @@ qx.Class.define("rhyacotriton.BasicTable",
       this.updateContent();
       this.getPaneScroller(0).updateVerScrollBarMaximum();
       this._updateScrollBarVisibility();
+      this.fireEvent("tableRefreshed");
     },
 
 
@@ -240,16 +242,18 @@ qx.Class.define("rhyacotriton.BasicTable",
      */
     __removeIds : function(ids)
     {
+      var n2p = this.getColumnNameToPositionIndex();
       for (var i in ids)
       {
         this.info("Purge from the table entry by real id " + id);
         var id = ids[i];
-        var pos = this.__tableModel.locate(this.__indexColumnId, id);
+        var pos = this.__tableModel.locate(n2p.id, id);
 
         /* Purge data from the table. */
 
         if (pos != 'undefined') this.__tableModel.removeRows(pos, 1);
       }
+      this.fireEvent("tableRefreshed");
     },
 
 
@@ -352,6 +356,7 @@ qx.Class.define("rhyacotriton.BasicTable",
     {
       var data = event.getOldData();
       this.__tableModel.addRowsAsMapArray([data]);
+      this.fireEvent("tableRefreshed");
     },
 
 
@@ -366,7 +371,7 @@ qx.Class.define("rhyacotriton.BasicTable",
       this.particallyUpdateRows(data.rows);
     },
 
-    __oldSelection : [],
+    _oldSelection : [],
     __unfilteredView : undefined,
     __filteredView : undefined,
     __mainTable : undefined,
@@ -378,23 +383,23 @@ qx.Class.define("rhyacotriton.BasicTable",
      */
     initFilters : function(main)
     {
-      var n2p = this.getColumnNameToPositionIndex();
       var tm = this.getTableModel();
       this.__mainTable = main;
 
       this.__unfilteredView = tm.getView();
 
-      this.__filteredView = tm.addView(function(row)
-      {
-        var tid = row[n2p.torrent_id];
-        return (this.__oldSelection.indexOf(tid) != -1);
-      },
-      this);
+      this.__filteredView = tm.addView(this._mainTableFilter, this);
 
       var msm = main.getSelectionModel();
       msm.addListener("changeSelection", this.updateFilters, this);
     },
 
+    _mainTableFilter : function(row)
+    {
+      var n2p = this.getColumnNameToPositionIndex();
+      var tid = row[n2p.torrent_id];
+      return (this._oldSelection.indexOf(tid) != -1);
+    },
 
     /**
      * TODOC
@@ -406,9 +411,9 @@ qx.Class.define("rhyacotriton.BasicTable",
       var tm = this.__tableModel; 
 
       var newSel = this.__mainTable.getSelectedIds();
-      if (qx.lang.Array.equals(this.__oldSelection, newSel)) return;
+      if (qx.lang.Array.equals(this._oldSelection, newSel)) return;
 
-      this.__oldSelection = qx.lang.Array.clone(newSel);
+      this._oldSelection = qx.lang.Array.clone(newSel);
 
       if (newSel.length == 0) {
         tm.setView(this.__unfilteredView);
@@ -419,6 +424,13 @@ qx.Class.define("rhyacotriton.BasicTable",
           tm.setView(this.__filteredView);
         tm.updateView(this.__filteredView);
       }
+      this.fireEvent("tableRefreshed");
     }
+  },
+
+  events :
+  {
+
+    "tableRefreshed" : "qx.event.type.Event"
   }
 });

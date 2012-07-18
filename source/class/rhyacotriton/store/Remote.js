@@ -142,16 +142,6 @@ qx.Class.define("rhyacotriton.store.Remote",
       });
     },
 
-    loadFileInfo : function(tid, fid) 
-    {
-      this.sendJSON(
-      {
-        "event"      : "file_info",
-        "torrent_id" : tid,
-        "file_id"    : fid
-      });
-    },
-
     getWishes : function(tid) 
     {
       this.sendJSON(
