@@ -13,6 +13,7 @@ qx.Class.define("rhyacotriton.Table",
       "id"                  : this.tr("Id"),
       "pid"                 : this.tr("Pid"),
       "name"                : this.tr("Name"),
+      "wanted"              : this.tr("Wanted"),
       "total"               : this.tr("Total"),
       "left"                : this.tr("Left"),
       "progress"            : this.tr("Progress"),
@@ -44,6 +45,7 @@ qx.Class.define("rhyacotriton.Table",
     rb.set(n2p.pid,       { width:"1*", minWidth: 70 });
     rb.set(n2p.progress,  { width:"1*", minWidth: 65 });
     rb.set(n2p.total,     { width:"1*", minWidth: 70 });
+    rb.set(n2p.wanted,    { width:"1*", minWidth: 70 });
     rb.set(n2p.left,      { width:"1*", minWidth: 70 });
     rb.set(n2p.leechers,  { width:"1*", minWidth: 40 });
     rb.set(n2p.seeders,   { width:"1*", minWidth: 40 });
@@ -64,8 +66,8 @@ qx.Class.define("rhyacotriton.Table",
     tcm.setDataCellRenderer(n2p.rating, new rhyacotriton.cellrenderer.Rating());
     tcm.setDataCellRenderer(n2p.online, new qx.ui.table.cellrenderer.Boolean());
 
-    [ n2p.total
-    , n2p.left
+    [ n2p.left
+    , n2p.wanted
     , n2p.downloaded
     , n2p.uploaded
     , n2p.all_time_downloaded
@@ -79,6 +81,7 @@ qx.Class.define("rhyacotriton.Table",
     tcm.setDataCellRenderer(n2p.speed_out, new rhyacotriton.cellrenderer.Speed());
 
     [ n2p.left
+    , n2p.total
     , n2p.online
     , n2p.downloaded
     , n2p.uploaded
@@ -119,11 +122,11 @@ qx.Class.define("rhyacotriton.Table",
     {
       var n2p = this.getColumnNameToPositionIndex();
 
-      var total = rowData[n2p.total];
+      var wanted = rowData[n2p.wanted];
       var left = rowData[n2p.left];
-      var completed = total - left;
+      var completed = wanted - left;
 
-      return (completed / total);
+      return (completed / wanted);
     },
 
 

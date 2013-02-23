@@ -11,6 +11,12 @@
 // Wish files
 #asset(qx/icon/Tango/22/actions/dialog-apply.png)
 
+// Skip files
+#asset(qx/icon/Tango/22/actions/dialog-close.png)
+
+// Unskip files
+#asset(qx/icon/Tango/22/actions/dialog-cancel.png)
+
 // Wishes
 #asset(qx/icon/Tango/22/actions/view-sort-descending.png)
 
@@ -80,6 +86,14 @@ qx.Class.define("rhyacotriton.ToolBar",
     this.__wishBtn = new qx.ui.toolbar.Button(this.tr("Wish files"), 
       "icon/22/actions/dialog-apply.png");
     this.__wishBtn.setCommand(controller.getCommand("wishSelectedFiles"));
+
+    this.__skipBtn = new qx.ui.toolbar.Button(this.tr("Skip files"), 
+      "icon/22/actions/dialog-close.png");
+    this.__skipBtn.setCommand(controller.getCommand("skipSelectedFiles"));
+
+    this.__unskipBtn = new qx.ui.toolbar.Button(this.tr("Unskip files"), 
+      "icon/22/actions/dialog-cancel.png");
+    this.__unskipBtn.setCommand(controller.getCommand("unskipSelectedFiles"));
 
     this.__peersView = new qx.ui.toolbar.RadioButton(this.tr("Peers"), 
       "icon/22/apps/preferences-users.png");
@@ -161,6 +175,8 @@ qx.Class.define("rhyacotriton.ToolBar",
     __enableFileRowButtons : function(flag)
     {
       [ this.__wishBtn
+      , this.__skipBtn
+      , this.__unskipBtn
       ].map(function(x) {
         x.setEnabled(flag);
       });
@@ -216,6 +232,8 @@ qx.Class.define("rhyacotriton.ToolBar",
 
       if (name == "file_tree") {
         this.addBefore(this.__wishBtn, this.__spacer);
+        this.addBefore(this.__skipBtn, this.__spacer);
+        this.addBefore(this.__unskipBtn, this.__spacer);
         return;
       }
     },
@@ -233,6 +251,8 @@ qx.Class.define("rhyacotriton.ToolBar",
 
       if (name == "file_tree") {
         this.tryRemove(this.__wishBtn);
+        this.tryRemove(this.__skipBtn);
+        this.tryRemove(this.__unskipBtn);
         return;
       }
     },

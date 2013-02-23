@@ -301,6 +301,14 @@ qx.Class.define("rhyacotriton.Container",
       commands.wishSelectedFiles.setToolTipText("Control+W");
       commands.wishSelectedFiles.addListener("execute", this.wishSelectedFiles, this);
 
+      commands.skipSelectedFiles = new qx.ui.core.Command("Control+K");
+      commands.skipSelectedFiles.setToolTipText("Control+K");
+      commands.skipSelectedFiles.addListener("execute", this.skipSelectedFiles, this);
+
+      commands.unskipSelectedFiles = new qx.ui.core.Command("Control+U");
+      commands.unskipSelectedFiles.setToolTipText("Control+U");
+      commands.unskipSelectedFiles.addListener("execute", this.unskipSelectedFiles, this);
+
 
       // Special commands
       commands.showWishView = new qx.ui.core.Command("Control+Shift+W");
@@ -321,6 +329,16 @@ qx.Class.define("rhyacotriton.Container",
     wishSelectedFiles : function()
     {
       this.__filesTree.wishSelectedIds();
+    },
+
+    skipSelectedFiles : function()
+    {
+      this.__filesTree.skipSelectedIds();
+    },
+
+    unskipSelectedFiles : function()
+    {
+      this.__filesTree.unskipSelectedIds();
     },
 
     /**

@@ -1,3 +1,13 @@
+/* ************************************************************************
+
+#asset(rhyacotriton/icon/16/files/folder-open-partical.png)
+#asset(rhyacotriton/icon/16/files/folder-open-skipped.png)
+#asset(rhyacotriton/icon/16/files/folder-partical.png)
+#asset(rhyacotriton/icon/16/files/folder-skipped.png)
+#asset(rhyacotriton/icon/16/files/office-skipped.png)
+
+************************************************************************ */
+
 qx.Class.define("rhyacotriton.files.Tree",
 {
   extend : qx.ui.treevirtual.TreeVirtual,
@@ -10,7 +20,8 @@ qx.Class.define("rhyacotriton.files.Tree",
       "id"             : this.tr("Id"),
       "size"           : this.tr("Size"),
       "capacity"       : this.tr("Count"),
-      "progress"       : this.tr("Progress")
+      "progress"       : this.tr("Progress"),
+      "mode"           : this.tr("Mode")
     };
     var n2p = {};
     var ids = [];
@@ -44,6 +55,7 @@ qx.Class.define("rhyacotriton.files.Tree",
 
     [ n2p.capacity
     , n2p.id 
+    , n2p.mode 
     ].map(function(id)
     {
       tcm.setColumnVisible(id, false);
@@ -76,6 +88,7 @@ qx.Class.define("rhyacotriton.files.Tree",
     msm.addListener("changeSelection", this.refresh, this);
     
     this.setAlwaysShowOpenCloseSymbol(true);
+    this.__preloadImages();
   },
 
   members : {
@@ -118,15 +131,25 @@ qx.Class.define("rhyacotriton.files.Tree",
         // get server id
         var sid = row[n2p.id];
         var name = row[n2p.name];
+        var mode = row[n2p.mode];
 
         // add a node to the tree
         if (typeof(this.__sid2nid[sid]) == 'undefined') {
           if (this.__isLeaf(sid)) {
-            var nid = dm.addLeaf(parent_nid, name);
+            var icon;
+            switch(mode) {
+                case "skip":
+                    icon  = "rhyacotriton/icon/16/files/office-skipped.png";
+                    break;
+                default:
+                    icon  = "icon/16/mimetypes/office-document.png";
+            }
+            var nid = dm.addLeaf(parent_nid, name, icon);
           } else {
             var is_empty = row.capacity == 0;
             var is_open = -1 != this.__openSids[tid].indexOf(sid);
-            var nid = dm.addBranch(parent_nid, name, is_open, is_empty);
+            var icon = this.__folderIcon(mode, is_open);
+            var nid = dm.addBranch(parent_nid, name, is_open, is_empty, icon);
           }
         }
         // save indexes
@@ -137,6 +160,67 @@ qx.Class.define("rhyacotriton.files.Tree",
           dm.setColumnData(nid, pos, row[pos]);
         }
       }
+    },
+
+    __folderIcon : function(mode, is_open) {
+        var icon;
+        if (is_open)
+        {
+          switch(mode) {
+            case "partial":
+                icon = "rhyacotriton/icon/16/files/folder-open-partical.png";
+                break;
+            case "skip":
+                icon = "rhyacotriton/icon/16/files/folder-open-skipped.png";
+                break;
+            default:
+                icon = "icon/16/places/folder-open.png";
+          }
+        }
+        else
+        {
+          switch(mode) {
+            case "partial":
+                icon = "rhyacotriton/icon/16/files/folder-partical.png";
+                break;
+            case "skip":
+                icon = "rhyacotriton/icon/16/files/folder-skipped.png";
+                break;
+            default:
+                icon = "icon/16/places/folder.png";
+          }
+        }
+        return icon;
+    },
+    
+    __preloadImages : function()
+    {
+      var ImageLoader = qx.io.ImageLoader;
+
+      var am = qx.util.AliasManager.getInstance();
+      var rm = qx.util.ResourceManager.getInstance();
+
+      var loadImage = function(f)
+      {
+        ImageLoader.load(rm.toUri(am.resolve(f)));
+      };
+
+      loadImage("rhyacotriton/icon/16/files/folder-open-partical.png");
+      loadImage("rhyacotriton/icon/16/files/folder-open-skipped.png");
+      loadImage("rhyacotriton/icon/16/files/folder-partical.png");
+      loadImage("rhyacotriton/icon/16/files/folder-skipped.png");
+      loadImage("rhyacotriton/icon/16/files/office-skipped.png");
+      loadImage("icon/16/mimetypes/office-document.png");
+      loadImage("icon/16/places/folder.png");
+    },
+
+
+    __updateFolderIcon : function(node)
+    {
+      var n2p = this.__n2p;
+      var dm = this.getDataModel();
+      var mode = dm.getColumnData(node.nodeId, n2p.mode);
+      node.icon = this.__folderIcon(mode, true);
     },
 
     __isLeaf : function(sid) {
@@ -178,6 +262,7 @@ qx.Class.define("rhyacotriton.files.Tree",
     onTreeOpen : function(e)
     {
       var node = e.getData();
+      this.__updateFolderIcon(node);
       var tid = this.__tid;
       var sid = this.__nid2sid[node.nodeId];
       this.__openSids[tid].push(sid);
@@ -191,6 +276,7 @@ qx.Class.define("rhyacotriton.files.Tree",
     onTreeClose : function(e)
     {
       var node = e.getData();
+      this.__updateFolderIcon(node);
       var tid = this.__tid;
       var sid = this.__nid2sid[node.nodeId];
       qx.lang.Array.remove(this.__openSids[tid], sid);
@@ -293,6 +379,172 @@ qx.Class.define("rhyacotriton.files.Tree",
       // Files' identificators on the server
       var sids = this.getSelectedIds();
       this.__store.wishSelectedFiles(this.__tid, sids);
+    },
+
+    skipSelectedIds : function()
+    {
+      var self = this;
+      // Files' identificators on the server
+      var sids = this.getSelectedIds();
+      this.__store.skipSelectedFiles(this.__tid, sids);
+
+      // Update tree icons.
+      var nodes = this.getSelectedNodes();
+      var dm = this.getDataModel();
+      var nodeArr = dm.getData();
+      var n2p = this.__n2p;
+      var mode_pos = n2p.mode;
+      for (var i = 0; i < nodes.length; i++)
+      {
+        var node = nodes[i];
+        // This node was skipped earlier.
+        // Check the next node.
+        if (node.columnData[mode_pos] == "skip")
+          continue;
+        // Update itself.
+        node.columnData[mode_pos] = "skip";
+        this.__setSkipIconForNode(node);
+        // Update descenders.
+        this.__setModeRec(node.children, "skip", mode_pos, nodeArr,
+                          function(node) {self.__setSkipIconForNode(node);});
+        // Update ancestors.
+        while (node.parentNodeId)
+        {
+          var nid = node.parentNodeId;
+          node = nodeArr[nid];
+          var mode = node.columnData[mode_pos];
+          // This node was skipped earlier.
+          // Stop hierarchy traversing.
+          if (mode == "skip")
+            break; // while
+          if (this.__haveAllSameValue(node.children, "skip", mode_pos, nodeArr))
+          {
+            // All children were skipped, skip their parent too.
+            node.columnData[mode_pos] = "skip";
+            node.iconSelected = node.icon = this.__folderIcon("skip", node.bOpened);
+            continue;
+          }
+          // This node was partial earlier.
+          // Stop hierarchy traversing.
+          if (mode == "partial")
+            break; // while
+          node.columnData[mode_pos] = "partial";
+          node.iconSelected = node.icon = this.__folderIcon("partial", node.bOpened);
+        }
+      }
+      this.__fireIconChanged();
+    },
+
+    unskipSelectedIds : function()
+    {
+      // Files' identificators on the server
+      var sids = this.getSelectedIds();
+      this.__store.unskipSelectedFiles(this.__tid, sids);
+
+      // Update tree icons.
+      var nodes = this.getSelectedNodes();
+      var dm = this.getDataModel();
+      var nodeArr = dm.getData();
+      var n2p = this.__n2p;
+      var mode_pos = n2p.mode;
+      for (var i = 0; i < nodes.length; i++)
+      {
+        var node = nodes[i];
+        // This node was OK earlier.
+        // Check the next node.
+        if (node.columnData[mode_pos] == "download")
+          continue;
+        // Update itself.
+        node.columnData[mode_pos] = "download";
+        this.__setNormalIconForNode(node);
+        // Update descenders.
+        this.__setModeRec(node.children, "download", mode_pos, nodeArr,
+                          function(node) {self.__setNormalIconForNode(node);});
+        // Update ancestors.
+        while (node.parentNodeId)
+        {
+          var nid = node.parentNodeId;
+          node = nodeArr[nid];
+          var mode = node.columnData[mode_pos];
+          // This node was marked as wanted earlier.
+          // Stop hierarchy traversing.
+          if (mode == "download")
+            break; // while
+          if (this.__haveAllSameValue(node.children, "download", mode_pos, nodeArr))
+          {
+            node.columnData[mode_pos] = "download";
+            node.iconSelected = node.icon = this.__folderIcon("download", node.bOpened);
+            continue;
+          }
+          // This node was partial earlier.
+          // Stop hierarchy traversing.
+          if (mode == "partial")
+            break; // while
+          node.columnData[mode_pos] = "partial";
+          node.iconSelected = node.icon = this.__folderIcon("partial", node.bOpened);
+        }
+      }
+      this.__fireIconChanged();
+    },
+
+
+    __fireIconChanged : function()
+    {
+      var dm = this.getDataModel();
+      var data =
+      {
+        firstRow    : 0,
+        lastRow     : dm.getRowCount() - 1,
+        firstColumn : 0,
+        lastColumn  : 1
+      };
+      dm.fireDataEvent("dataChanged", data);
+    },
+
+    __setSkipIconForNode : function(node)
+    {
+      if (node.type == qx.ui.treevirtual.MTreePrimitive.Type.LEAF)
+      {
+        node.iconSelected = node.icon = "rhyacotriton/icon/16/files/office-skipped.png";
+      } else {
+        node.iconSelected = node.icon = this.__folderIcon("skip", node.bOpened);
+      }
+    },
+
+    __setNormalIconForNode : function(node)
+    {
+      if (node.type == qx.ui.treevirtual.MTreePrimitive.Type.LEAF)
+      {
+        node.iconSelected = node.icon = "icon/16/mimetypes/office-document.png";
+      } else {
+        node.iconSelected = node.icon = this.__folderIcon("download", node.bOpened);
+      }
+    },
+
+    __haveAllSameValue: function(nids, value, column_pos, nodeArr)
+    {
+      for (var i = 0; i < nids.length; i++)
+      {
+        if (nodeArr[ nids[i] ].columnData[column_pos] != value)
+          return false;
+      }
+      return true;
+    },
+
+    __setModeRec: function(children, mode, mode_pos, nodeArr, iter)
+    {
+      for (var i = 0; i < children.length; i++)
+      {
+        var nid = children[i],
+            node = nodeArr[nid];
+        if (!node)
+          break; // not loaded yet.
+        if (node.columnData[mode_pos] == mode)
+          continue;
+        node.columnData[mode_pos] = mode;
+        iter(node);
+        this.__setModeRec(node.children, mode, mode_pos, nodeArr);
+      }
     },
 
     

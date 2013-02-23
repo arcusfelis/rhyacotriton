@@ -171,6 +171,26 @@ qx.Class.define("rhyacotriton.store.Remote",
       });
     },
 
+    skipSelectedFiles : function(tid, nids) 
+    {
+      this.sendJSON(
+      {
+        "event"      : "skip_files",
+        "torrent_id" : tid,
+        "file_ids"   : nids
+      });
+    },
+
+    unskipSelectedFiles : function(tid, nids) 
+    {
+      this.sendJSON(
+      {
+        "event"      : "unskip_files",
+        "torrent_id" : tid,
+        "file_ids"   : nids
+      });
+    },
+
     /**
      * TODOC
      *

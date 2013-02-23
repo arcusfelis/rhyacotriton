@@ -91,6 +91,8 @@ qx.Class.define("rhyacotriton.store.Abstract",
     getWishes : function(tid) {},
     setWishes : function(tid, list) {},
     wishSelectedFiles : function(tid, nids) {},
+    skipSelectedFiles : function(tid, nids) {},
+    unskipSelectedFiles : function(tid, nids) {},
 
     /**
      * This functions allows to sort pids in the table.
