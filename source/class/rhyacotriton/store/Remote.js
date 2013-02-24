@@ -259,15 +259,16 @@ qx.Class.define("rhyacotriton.store.Remote",
       } catch(err) {
         this.error("There are some problems with bullet.", err);
       }
+      var self = this;
 
       // Cannot purge it fully.
       // Avoid few connections.
       this.__bullet.onclose = function() {
-        this.info("Old connection was closed");
+        self.info("Old connection was closed");
       };
 
       this.__bullet.onmessage = function() {
-        this.error("FIXME: deads are alive.");
+        self.error("FIXME: deads are alive.");
       };
 
       this.__bullet.onheartbeat = this.__bullet.onmessage;
