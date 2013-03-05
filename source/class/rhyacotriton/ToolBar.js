@@ -111,14 +111,18 @@ qx.Class.define("rhyacotriton.ToolBar",
       "icon/22/apps/utilities-log-viewer.png");
     this.__logView.setUserData("value", "log");
 
+    this.__ctrlButtons = new qx.ui.toolbar.Part;
+    this.__viewButtons = new qx.ui.toolbar.Part;
+    this.__fileButtons = new qx.ui.toolbar.Part;
+    this.__mainButtons = new qx.ui.toolbar.Part;
 
-    this.add(this.__reconnectBtn);
-    this.add(this.__reloadBtn);
-    this.__spacer = this.addSpacer();
-    this.add(this.__peersView);
-    this.add(this.__filesView);
-    this.add(this.__wishesView);
-    this.add(this.__logView);
+    this.__ctrlButtons.add(this.__reconnectBtn);
+    this.__ctrlButtons.add(this.__reloadBtn);
+
+    this.__viewButtons.add(this.__peersView);
+    this.__viewButtons.add(this.__filesView);
+    this.__viewButtons.add(this.__wishesView);
+    this.__viewButtons.add(this.__logView);
 
     this.__viewGroup = new qx.ui.form.RadioGroup;
     this.__viewGroup.setAllowEmptySelection(true);
@@ -128,6 +132,20 @@ qx.Class.define("rhyacotriton.ToolBar",
     this.__viewGroup.add(this.__peersView);
     this.__viewGroup.addListener("changeSelection", controller.syncStackView, 
       controller);
+
+    this.__fileButtons.add(this.__wishBtn);
+    this.__fileButtons.add(this.__skipBtn);
+    this.__fileButtons.add(this.__unskipBtn);
+
+//  this.__mainButtons.add(this.__removeBtn);
+    this.__mainButtons.add(this.__startBtn);
+    this.__mainButtons.add(this.__stopBtn);
+
+    this.add(this.__ctrlButtons);
+    this.add(this.__mainButtons);
+    this.__spacer = this.addSpacer();
+    this.add(this.__viewButtons);
+
 
     this.__addRadioCommand("showPeerView", this.__peersView);
     this.__addRadioCommand("showFileView", this.__filesView);
@@ -150,9 +168,7 @@ qx.Class.define("rhyacotriton.ToolBar",
       var cmd = this.__controller.getCommand(name);
 
       // The button will be pressed by the program.
-      cmd.addListener("execute", 
-        btn.toggleValue, 
-        btn);
+      cmd.addListener("execute", btn.toggleValue, btn);
 
       btn.setToolTipText(cmd.getToolTipText());
     },
@@ -225,15 +241,12 @@ qx.Class.define("rhyacotriton.ToolBar",
     {
       this.info("Activate " + name + " buttonset.");
       if (name == "torrent_table") {
-        this.addBefore(this.__startBtn, this.__spacer);
-        this.addBefore(this.__stopBtn, this.__spacer);
+        this.addBefore(this.__mainButtons, this.__spacer);
         return;
       }
 
       if (name == "file_tree") {
-        this.addBefore(this.__wishBtn, this.__spacer);
-        this.addBefore(this.__skipBtn, this.__spacer);
-        this.addBefore(this.__unskipBtn, this.__spacer);
+        this.addBefore(this.__fileButtons, this.__spacer);
         return;
       }
     },
@@ -243,16 +256,13 @@ qx.Class.define("rhyacotriton.ToolBar",
     {
       this.info("Deactivate " + name + " buttonset.");
       if (name == "torrent_table") {
-        this.tryRemove(this.__startBtn);
-        this.tryRemove(this.__stopBtn);
+        this.tryRemove(this.__mainButtons);
         return;
       }
 
 
       if (name == "file_tree") {
-        this.tryRemove(this.__wishBtn);
-        this.tryRemove(this.__skipBtn);
-        this.tryRemove(this.__unskipBtn);
+        this.tryRemove(this.__fileButtons);
         return;
       }
     },

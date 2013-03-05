@@ -12,7 +12,8 @@ qx.Class.define("rhyacotriton.Table",
     {
       "id"                  : this.tr("Id"),
       "pid"                 : this.tr("Pid"),
-      "name"                : this.tr("Name"),
+      "name"                : this.tr("Torrent Name"),
+      "display_name"        : this.tr("Name"),
       "wanted"              : this.tr("Wanted"),
       "total"               : this.tr("Total"),
       "left"                : this.tr("Left"),
@@ -40,7 +41,8 @@ qx.Class.define("rhyacotriton.Table",
 
     var rb = tcm.getBehavior();
 
-    rb.set(n2p.name,      { width:"1*", minWidth: 250 });
+    rb.set(n2p.name,        { width:"1*", minWidth: 250 });
+    rb.set(n2p.display_name, { width:"1*", minWidth: 250 });
     rb.set(n2p.id,        { width:"1*", minWidth: 30 });
     rb.set(n2p.pid,       { width:"1*", minWidth: 70 });
     rb.set(n2p.progress,  { width:"1*", minWidth: 65 });
@@ -80,7 +82,8 @@ qx.Class.define("rhyacotriton.Table",
     tcm.setDataCellRenderer(n2p.speed_in, new rhyacotriton.cellrenderer.Speed());
     tcm.setDataCellRenderer(n2p.speed_out, new rhyacotriton.cellrenderer.Speed());
 
-    [ n2p.left
+    [ n2p.name
+    , n2p.left
     , n2p.total
     , n2p.online
     , n2p.downloaded

@@ -38,6 +38,9 @@ qx.Class.define("rhyacotriton.files.Tree",
     
     var custom = {dataModel: new rhyacotriton.files.Model(this)};
     this.base(arguments, captions, custom);
+    // Highlighting of the focused rows is pretty slow.
+    // Disable it.
+    this.highlightFocusedRow(false);
     
     this.__n2p = n2p;
     this.__ids = ids;
@@ -215,12 +218,18 @@ qx.Class.define("rhyacotriton.files.Tree",
     },
 
 
-    __updateFolderIcon : function(node)
+    __updateFolderIcon : function(node, invertOpened)
     {
       var n2p = this.__n2p;
       var dm = this.getDataModel();
       var mode = dm.getColumnData(node.nodeId, n2p.mode);
-      node.icon = this.__folderIcon(mode, true);
+      var is_open = this.__xor(node.bOpened, invertOpened);
+      node.icon = this.__folderIcon(mode, is_open);
+    },
+
+    __xor : function(x, y)
+    {
+      return !!(!x ^ !y);
     },
 
     __isLeaf : function(sid) {
@@ -262,7 +271,7 @@ qx.Class.define("rhyacotriton.files.Tree",
     onTreeOpen : function(e)
     {
       var node = e.getData();
-      this.__updateFolderIcon(node);
+      this.__updateFolderIcon(node, true);
       var tid = this.__tid;
       var sid = this.__nid2sid[node.nodeId];
       this.__openSids[tid].push(sid);
@@ -276,10 +285,11 @@ qx.Class.define("rhyacotriton.files.Tree",
     onTreeClose : function(e)
     {
       var node = e.getData();
-      this.__updateFolderIcon(node);
+      this.__updateFolderIcon(node, true);
       var tid = this.__tid;
       var sid = this.__nid2sid[node.nodeId];
       qx.lang.Array.remove(this.__openSids[tid], sid);
+      this.__fireIconChanged(node);
     },
 
 
@@ -488,16 +498,31 @@ qx.Class.define("rhyacotriton.files.Tree",
     },
 
 
-    __fireIconChanged : function()
+    __fireIconChanged : function(node)
     {
+      var data;
       var dm = this.getDataModel();
-      var data =
+      if (node === undefined)
       {
-        firstRow    : 0,
-        lastRow     : dm.getRowCount() - 1,
-        firstColumn : 0,
-        lastColumn  : 1
-      };
+          data =
+          {
+            firstRow    : 0,
+            lastRow     : dm.getRowCount() - 1,
+            firstColumn : 0,
+            lastColumn  : 0
+          };
+      }
+      else
+      {
+          var rowId = dm.getRowFromNodeId(node.nodeId);
+          data =
+          {
+            firstRow    : rowId,
+            lastRow     : rowId,
+            firstColumn : 0,
+            lastColumn  : 0
+          };
+      }
       dm.fireDataEvent("dataChanged", data);
     },
 
