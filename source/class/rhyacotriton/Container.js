@@ -251,7 +251,13 @@ qx.Class.define("rhyacotriton.Container",
      * TODOC
      *
      */
-    showAddTorrent : function() {},
+    showAddTorrentDialog : function() {
+      var win = new rhyacotriton.AddTorrentWindow();
+      this.getRoot().add(win);
+      win.show();
+//    win.focus();
+      win.addListener("close", this.__table.focus, this.__table);
+    },
 
 
     /**
@@ -283,7 +289,7 @@ qx.Class.define("rhyacotriton.Container",
 
       commands.addTorrent = new qx.ui.core.Command("Control+A");
       commands.addTorrent.setToolTipText("Control+A");
-      commands.addTorrent.addListener("execute", this.showAddTorrent, this);
+      commands.addTorrent.addListener("execute", this.showAddTorrentDialog, this);
 
       commands.removeSelectedRows = new qx.ui.core.Command("Control+D");
       commands.removeSelectedRows.setToolTipText("Control+D");

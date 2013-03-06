@@ -138,6 +138,7 @@ qx.Class.define("rhyacotriton.ToolBar",
     this.__fileButtons.add(this.__unskipBtn);
 
 //  this.__mainButtons.add(this.__removeBtn);
+    this.__mainButtons.add(this.__addBtn);
     this.__mainButtons.add(this.__startBtn);
     this.__mainButtons.add(this.__stopBtn);
 
