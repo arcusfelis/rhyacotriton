@@ -76,6 +76,8 @@ qx.Class.define("rhyacotriton.store.Abstract",
       return this.__isActive;
     },
 
+    addTorrent : function(data) {},
+
 
     /**
      * TODOC

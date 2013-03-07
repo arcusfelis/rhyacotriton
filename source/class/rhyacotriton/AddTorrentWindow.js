@@ -20,8 +20,8 @@ qx.Class.define("rhyacotriton.AddTorrentWindow",
     form.add(address_ta, "Address", null, "address");
     form.add(paused_cb, "Pause", "paused");
 
-    var saveButton = this.__saveButton = new qx.ui.form.Button(this.tr("Save")); 
-    saveButton.addListener("execute", this.__save, this);                        
+    var saveButton = this.__saveButton = new qx.ui.form.Button(this.tr("Save"));
+    saveButton.addListener("execute", this.__save, this);
     form.addButton(saveButton);
 
     this.add(new qx.ui.form.renderer.Single(form));
@@ -45,8 +45,12 @@ qx.Class.define("rhyacotriton.AddTorrentWindow",
   members: {
     __save: function()
     {
-      console.dir(qx.util.Serializer.toNativeObject(this.__model));
+      var data = qx.util.Serializer.toNativeObject(this.__model);
+      this.fireDataEvent("submitData", data);
       this.close();
     }
+  },
+  events : {
+    "submitData" : "qx.event.type.Data"
   }
 });

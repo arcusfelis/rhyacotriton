@@ -257,6 +257,11 @@ qx.Class.define("rhyacotriton.Container",
       win.show();
 //    win.focus();
       win.addListener("close", this.__table.focus, this.__table);
+      win.addListener("submitData", this.__addTorrentSubmit, this);
+    },
+
+    __addTorrentSubmit : function(e) {
+        this.__store.addTorrent(e.getData());
     },
 
 

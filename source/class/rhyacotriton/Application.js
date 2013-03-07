@@ -42,6 +42,7 @@ qx.Class.define("rhyacotriton.Application",
     {
       // Call super class
       this.base(arguments);
+      this.getRoot().setNativeContextMenu(true);
 
       // Enable logging in debug variant
 //    if (qx.core.Environment.get("qx.debug"))

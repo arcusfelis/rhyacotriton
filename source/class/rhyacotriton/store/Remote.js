@@ -132,6 +132,12 @@ qx.Class.define("rhyacotriton.store.Remote",
       });
     },
 
+    addTorrent : function( /* Object */ data)
+    {
+      data.event = "add_torrent";
+      this.sendJSON(data);
+    },
+
     getFileTreeNode : function(tid, nids) 
     {
       this.sendJSON(
